@@ -1,3 +1,4 @@
+import { supabase } from '../lib/supabase.js'
 import { useParams } from 'react-router-dom'
 
 export function TaskDetail() {
@@ -20,11 +21,14 @@ export function ClientPortal() {
 
 export function Login() {
   const handleGoogleLogin = async () => {
-    const { createClient } = await import('@supabase/supabase-js')
-    // supabase.auth.signInWithOAuth is called in the real implementation
-    // Stub: import from lib/supabase and call signInWithOAuth({ provider: 'google' })
-    alert('Connect Supabase env vars, then implement Google OAuth here.')
-  }
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: window.location.origin
+    }
+  })
+  if (error) console.error(error)
+}
 
   return (
     <div className="min-h-dvh bg-dark-bg flex items-center justify-center">
