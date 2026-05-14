@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #1E1E1C;
+    @apply text-dark-text font-sans antialiased;
+    min-height: 100dvh;
+  }
+
+  * { box-sizing: border-box; }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { @apply bg-dark-elevated rounded-full; }
+}
+
+@layer components {
+  .card {
+    background-color: #252523;
+    border: 0.5px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+  }
+
+  .btn {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5
+           text-xs
+           bg-transparent rounded
+           transition-colors cursor-pointer;
+    color: #9C9A92;
+    border: 0.5px solid rgba(255,255,255,0.15);
+  }
+
+  .btn:hover {
+    background-color: #2A2A28;
+    color: #E8E6DF;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5
+           text-xs rounded transition-colors cursor-pointer;
+    background-color: #085041;
+    border: 0.5px solid #085041;
+    color: #9FE1CB;
+  }
+
+  .btn-primary:hover { background-color: #0F6E56; }
+
+  .badge {
+    @apply inline-flex items-center text-xs font-medium px-2 py-0.5 rounded;
+  }
+
+  .badge-green { background-color: #0A2018; color: #5DCAA5; }
+  .badge-blue  { background-color: #0C2A42; color: #85B7EB; }
+  .badge-amber { background-color: #1C130A; color: #FAC775; }
+  .badge-red   { background-color: #1C0808; color: #F09595; }
+  .badge-gray  { background-color: #2A2A28; color: #9C9A92; }
+
+  .progress-bar {
+    @apply h-0.5 rounded-full overflow-hidden;
+    background-color: rgba(255,255,255,0.08);
+  }
+
+  .progress-fill {
+    @apply h-full rounded-full transition-all duration-500;
+  }
+}
