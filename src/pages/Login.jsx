@@ -35,7 +35,7 @@ export default function Login() {
               Studio OS
             </h1>
             <p className="mt-1.5 text-sm text-dark-muted animate-fade-up animate-delay-1">
-              Client management for solo creatives.
+              Your brand. Your business. All in one place.
             </p>
           </div>
 
@@ -73,7 +73,7 @@ export default function Login() {
         </div>
 
         <p className="mt-6 text-center text-[11px] tracking-wide text-dark-subtle animate-fade-in animate-delay-4">
-          Studio OS · built for solo work
+          Sabbath Studios · Studio OS · Client & Project Hub
         </p>
       </main>
     </div>
