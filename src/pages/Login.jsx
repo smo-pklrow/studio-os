@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase.js'
+import logoUrl from '../assets/logo.png'
 
 export default function Login() {
   const [loading, setLoading] = useState(false)
@@ -134,7 +135,7 @@ function BackgroundField() {
 
 function Logomark() {
   return (
-    <div className="relative h-12 w-12 animate-fade-in">
+    <div className="relative flex h-12 items-center justify-center animate-fade-in">
       {/* Brand halo */}
       <div
         className="absolute inset-0 -m-4 rounded-2xl blur-2xl animate-pulse-glow"
@@ -143,41 +144,11 @@ function Logomark() {
             'radial-gradient(closest-side, rgba(29,158,117,0.55), transparent 70%)',
         }}
       />
-      <svg
-        viewBox="0 0 48 48"
-        xmlns="http://www.w3.org/2000/svg"
-        className="relative h-full w-full"
-        aria-hidden="true"
-      >
-        <defs>
-          <linearGradient id="studioos-front" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#1D9E75" />
-            <stop offset="100%" stopColor="#0F6E56" />
-          </linearGradient>
-          <linearGradient id="studioos-stroke" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#9FE1CB" stopOpacity="0.7" />
-            <stop offset="100%" stopColor="#1D9E75" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-
-        {/* Back card */}
-        <rect x="5" y="5" width="26" height="26" rx="7" fill="#0F6E56" opacity="0.55" />
-        {/* Front card */}
-        <rect x="17" y="17" width="26" height="26" rx="7" fill="url(#studioos-front)" />
-        {/* Front-card highlight stroke */}
-        <rect
-          x="17.5"
-          y="17.5"
-          width="25"
-          height="25"
-          rx="6.5"
-          fill="none"
-          stroke="url(#studioos-stroke)"
-          strokeWidth="1"
-        />
-        {/* Subtle top sheen */}
-        <rect x="18" y="18" width="24" height="2" rx="1" fill="white" opacity="0.08" />
-      </svg>
+      <img
+        src={logoUrl}
+        alt="Studio OS"
+        className="relative h-full w-auto object-contain"
+      />
     </div>
   )
 }
