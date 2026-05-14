@@ -2,67 +2,312 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =============================================================
+   Studio OS — Design Tokens
+   Dark-only. All component styles consume these CSS variables.
+   ============================================================= */
+
+:root {
+  color-scheme: dark;
+
+  /* --- Surfaces ------------------------------------------------ */
+  --color-bg:             #1E1E1C;
+  --color-surface:        #252523;
+  --color-elevated:       #2A2A28;
+  --color-elevated-hi:    #323230;
+  --color-overlay:        rgba(0, 0, 0, 0.55);
+
+  /* --- Brand --------------------------------------------------- */
+  --color-brand:          #1D9E75;
+  --color-brand-dark:     #0F6E56;
+  --color-brand-deep:     #085041;
+  --color-brand-tint:     #9FE1CB;
+  --color-brand-glow:     rgba(29, 158, 117, 0.18);
+
+  /* --- Text ---------------------------------------------------- */
+  --color-text:           #E8E6DF;
+  --color-muted:          #9C9A92;
+  --color-subtle:         #6B6963;
+
+  /* --- Borders / dividers ------------------------------------- */
+  --border-subtle:        rgba(255, 255, 255, 0.05);
+  --border-default:       rgba(255, 255, 255, 0.08);
+  --border-strong:        rgba(255, 255, 255, 0.14);
+  --border-brand:         rgba(29, 158, 117, 0.45);
+
+  /* --- Status accents (badges) -------------------------------- */
+  --color-green-bg:       #0A2018;
+  --color-green-fg:       #5DCAA5;
+  --color-blue-bg:        #0C2A42;
+  --color-blue-fg:        #85B7EB;
+  --color-amber-bg:       #1C130A;
+  --color-amber-fg:       #FAC775;
+  --color-red-bg:         #1C0808;
+  --color-red-fg:         #F09595;
+
+  /* --- Radii --------------------------------------------------- */
+  --radius-sm:            6px;
+  --radius:               8px;
+  --radius-md:            10px;
+  --radius-lg:            12px;
+  --radius-xl:            16px;
+  --radius-2xl:           20px;
+  --radius-full:          9999px;
+
+  /* --- Elevation ---------------------------------------------- */
+  --shadow-sm:            0 1px 2px rgba(0, 0, 0, 0.30);
+  --shadow-md:            0 4px 16px rgba(0, 0, 0, 0.32);
+  --shadow-lg:            0 24px 48px -12px rgba(0, 0, 0, 0.55),
+                          0 2px 6px rgba(0, 0, 0, 0.35);
+  --shadow-ring:          0 0 0 1px var(--color-brand-dark),
+                          0 0 0 4px rgba(29, 158, 117, 0.18);
+
+  /* --- Motion -------------------------------------------------- */
+  --ease-out:             cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out:          cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast:        120ms;
+  --duration:             180ms;
+  --duration-slow:        320ms;
+
+  /* --- Typography --------------------------------------------- */
+  --font-sans:            'DM Sans', ui-sans-serif, system-ui, -apple-system,
+                          'Segoe UI', sans-serif;
+}
+
+/* =============================================================
+   Base
+   ============================================================= */
+
 @layer base {
+  html {
+    background-color: var(--color-bg);
+  }
+
   body {
-    background-color: #1E1E1C;
-    @apply text-dark-text font-sans antialiased;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
     min-height: 100dvh;
   }
 
-  * { box-sizing: border-box; }
+  * {
+    box-sizing: border-box;
+  }
 
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { @apply bg-dark-elevated rounded-full; }
+  ::selection {
+    background: rgba(29, 158, 117, 0.28);
+    color: var(--color-text);
+  }
+
+  /* Brand-aware focus ring for interactive elements */
+  button:focus-visible,
+  a:focus-visible,
+  [role="button"]:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-ring);
+  }
+
+  /* ---------- Custom scrollbar (WebKit / Blink) ---------- */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--color-elevated);
+    border: 2px solid var(--color-bg);
+    border-radius: var(--radius-full);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-elevated-hi);
+  }
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  /* ---------- Custom scrollbar (Firefox) ---------- */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-elevated) transparent;
+  }
 }
 
+/* =============================================================
+   Components
+   ============================================================= */
+
 @layer components {
+  /* ----------- Card ----------- */
   .card {
-    background-color: #252523;
-    border: 0.5px solid rgba(255,255,255,0.08);
-    border-radius: 12px;
+    background-color: var(--color-surface);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    transition:
+      background-color var(--duration) var(--ease-out),
+      border-color     var(--duration) var(--ease-out);
   }
 
+  .card-elevated {
+    background-color: var(--color-elevated);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .card-interactive {
+    cursor: pointer;
+  }
+  .card-interactive:hover {
+    border-color: var(--border-strong);
+    background-color: var(--color-elevated);
+  }
+
+  /* ----------- Buttons ----------- */
   .btn {
-    @apply inline-flex items-center gap-1.5 px-3 py-1.5
-           text-xs
-           bg-transparent rounded
-           transition-colors cursor-pointer;
-    color: #9C9A92;
-    border: 0.5px solid rgba(255,255,255,0.15);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 32px;
+    padding: 0 0.875rem;
+    font-family: inherit;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--color-muted);
+    background-color: transparent;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    transition:
+      background-color var(--duration)      var(--ease-out),
+      color            var(--duration)      var(--ease-out),
+      border-color     var(--duration)      var(--ease-out),
+      box-shadow       var(--duration)      var(--ease-out),
+      transform        var(--duration-fast) var(--ease-out);
   }
-
-  .btn:hover {
-    background-color: #2A2A28;
-    color: #E8E6DF;
+  .btn:hover:not(:disabled) {
+    background-color: var(--color-elevated);
+    border-color: rgba(255, 255, 255, 0.22);
+    color: var(--color-text);
+  }
+  .btn:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+  .btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
   }
 
   .btn-primary {
-    @apply inline-flex items-center gap-1.5 px-3 py-1.5
-           text-xs rounded transition-colors cursor-pointer;
-    background-color: #085041;
-    border: 0.5px solid #085041;
-    color: #9FE1CB;
+    color: var(--color-brand-tint);
+    background-color: var(--color-brand-deep);
+    border-color: var(--color-brand-dark);
+  }
+  .btn-primary:hover:not(:disabled) {
+    background-color: var(--color-brand-dark);
+    border-color: var(--color-brand);
+    color: #D8F2E5;
   }
 
-  .btn-primary:hover { background-color: #0F6E56; }
+  .btn-ghost {
+    border-color: transparent;
+  }
+  .btn-ghost:hover:not(:disabled) {
+    border-color: transparent;
+    background-color: var(--color-elevated);
+  }
 
+  .btn-lg {
+    height: 40px;
+    padding: 0 1.125rem;
+    font-size: 0.875rem;
+    border-radius: var(--radius-md);
+  }
+
+  /* ----------- Badges ----------- */
   .badge {
-    @apply inline-flex items-center text-xs font-medium px-2 py-0.5 rounded;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3125rem;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0.01em;
+    border-radius: var(--radius-sm);
   }
 
-  .badge-green { background-color: #0A2018; color: #5DCAA5; }
-  .badge-blue  { background-color: #0C2A42; color: #85B7EB; }
-  .badge-amber { background-color: #1C130A; color: #FAC775; }
-  .badge-red   { background-color: #1C0808; color: #F09595; }
-  .badge-gray  { background-color: #2A2A28; color: #9C9A92; }
+  .badge-green { background-color: var(--color-green-bg); color: var(--color-green-fg); }
+  .badge-blue  { background-color: var(--color-blue-bg);  color: var(--color-blue-fg);  }
+  .badge-amber { background-color: var(--color-amber-bg); color: var(--color-amber-fg); }
+  .badge-red   { background-color: var(--color-red-bg);   color: var(--color-red-fg);   }
+  .badge-gray  { background-color: var(--color-elevated); color: var(--color-muted);    }
 
+  /* ----------- Progress ----------- */
   .progress-bar {
-    @apply h-0.5 rounded-full overflow-hidden;
-    background-color: rgba(255,255,255,0.08);
+    width: 100%;
+    height: 4px;
+    background-color: rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-brand-dark), var(--color-brand));
+    border-radius: inherit;
+    transition: width 480ms var(--ease-out);
+  }
+}
+
+/* =============================================================
+   Utilities — animations
+   ============================================================= */
+
+@layer utilities {
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes pulse-glow {
+    0%, 100% { opacity: 0.75; transform: scale(1); }
+    50%      { opacity: 1;    transform: scale(1.04); }
+  }
+  @keyframes drift {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    50%      { transform: translate3d(0, -12px, 0); }
   }
 
-  .progress-fill {
-    @apply h-full rounded-full transition-all duration-500;
+  .animate-fade-up    { animation: fade-up    540ms var(--ease-out) both; }
+  .animate-fade-in    { animation: fade-in    360ms var(--ease-out) both; }
+  .animate-pulse-glow { animation: pulse-glow 5.2s  var(--ease-in-out) infinite; }
+  .animate-drift      { animation: drift      14s   var(--ease-in-out) infinite; }
+
+  .animate-delay-1 { animation-delay: 80ms; }
+  .animate-delay-2 { animation-delay: 160ms; }
+  .animate-delay-3 { animation-delay: 240ms; }
+  .animate-delay-4 { animation-delay: 320ms; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
