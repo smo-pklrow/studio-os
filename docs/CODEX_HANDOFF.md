@@ -18,6 +18,16 @@ No multi-tenancy. No teams. No real-time collaboration beyond Supabase's built-i
 src/components/<feature>/<ComponentName>.jsx
 ```
 
+Current component tree:
+```
+components/
+  layout/     AppShell, WeekCalendar, DigestStrip, StatsBar
+  clients/    ClientCard, ClientRow, ClientHeader, AddClientModal
+  tasks/      TaskGroup, TaskRow, AddTaskRow
+  braindump/  BrainDumpCanvas, BrainDumpCard
+  shared/     (Badge, Button, Avatar — not yet built)
+```
+
 - PascalCase filenames
 - Default export only
 - Props destructured at top of function signature

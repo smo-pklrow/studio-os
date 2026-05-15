@@ -36,10 +36,21 @@
 - [ ] Empty state polish — illustration / onboarding copy
 
 ### Client Board (Level 2)
-- [ ] Tasks tab — full CRUD with drag-drop reorder
-- [ ] Brain Dump tab — add/edit/delete note cards
-- [ ] Tab persistence (remember last tab per client)
-- [ ] Client header with logo, status selector
+- [x] `useClient` hook — fetch single client by ID
+- [x] `useTasks` hook — fetch task_groups + tasks by client_id, create/update/delete tasks + groups, drag-drop reorder (sort_order)
+- [x] `useBrainDump` hook — fetch brain_dump_cards by client_id, create/update/delete
+- [x] Breadcrumb nav — All clients › Client name
+- [x] Client header — logo/avatar, name + project_name, health badge + % complete, start_date + due_date, "Client link" button (copies portal URL)
+- [x] Tasks tab — active state underline
+- [x] Brain dump tab — active state underline
+- [x] Tab persistence — localStorage keyed by client ID
+- [x] Task group row — colored dot, group name, task count + done count, collapse/expand
+- [x] Task row — checkbox (toggles done/todo), title (strikethrough when done), status dropdown (todo / in_progress / done / blocked), due date (amber if overdue or today), priority badge, drag handle, delete on hover
+- [x] Inline "Add task" — per group, Enter to save, Escape to cancel
+- [x] "New group" — inline input at bottom of task list, auto-assigned color from palette
+- [x] Drag-drop reorder — tasks within a group via @dnd-kit (PointerSensor + distance:8 activation)
+- [x] Brain dump canvas — responsive grid of sticky cards, "Add card" slot
+- [x] Brain dump card — colored sticky (amber/green/blue/pink/purple), click to edit, delete on hover
 
 ### Task Detail (Level 3)
 - [ ] Task title, description, due date, status
@@ -52,9 +63,10 @@
 - [ ] Read-only task list with status
 
 ### Hooks refactor
-- [x] `useClients` — fetch, create, archive, update
-- [ ] `useTasks` — fetch by client, CRUD, reorder
-- [ ] `useBrainDump` — fetch by client, CRUD
+- [x] `useClients` — fetch all (enriched with task stats), create, archive, update
+- [x] `useClient` — single client by ID (for ClientBoard header)
+- [x] `useTasks` — task groups + tasks by client, CRUD, drag-drop reorder
+- [x] `useBrainDump` — brain dump cards by client, CRUD
 
 ---
 
