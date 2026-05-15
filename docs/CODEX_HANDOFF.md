@@ -12,6 +12,18 @@ No multi-tenancy. No teams. No real-time collaboration beyond Supabase's built-i
 
 ---
 
+## Supporting documentation
+
+Before generating any code, check the relevant doc in `/docs/`:
+- `DESIGN_TOKENS.md` — all colors, spacing, typography, component patterns
+- `UX_FLOWS.md` — user journeys, screen transitions, edge cases
+- `DATA_MODEL.md` — every table in plain English, RLS intent, what creates/deletes rows
+- `AGENT_PROMPTS.md` — all Claude API prompts for Phase 3 features (do not rewrite these)
+- `INTEGRATIONS.md` — technical contracts for Calendar, Buffer, Figma, Managed Agents
+- `DECISIONS.md` — why major decisions were made (read before proposing alternatives)
+
+---
+
 ## Component conventions
 
 ```
