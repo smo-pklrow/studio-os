@@ -8,9 +8,11 @@ import Login from './pages/Login.jsx'
 import Settings from './pages/Settings.jsx'
 import NotFound from './pages/NotFound.jsx'
 import ErrorBoundary from './components/shared/ErrorBoundary.jsx'
+import { ToastProvider } from './components/shared/Toast.jsx'
 
 export default function App() {
   return (
+    <ToastProvider>
     <Routes>
       {/* Public routes — no auth required */}
       <Route path="/portal/:shareToken" element={<ClientPortal />} />
@@ -25,5 +27,6 @@ export default function App() {
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
+    </ToastProvider>
   )
 }

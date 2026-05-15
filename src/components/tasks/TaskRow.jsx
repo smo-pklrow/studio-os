@@ -106,11 +106,12 @@ export default function TaskRow({ task, onUpdate, onDelete }) {
     >
       {/* Drag handle */}
       <div
-        className="flex items-center justify-center text-dark-subtle opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing transition-opacity select-none"
+        className="tooltip flex items-center justify-center text-dark-subtle opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing transition-opacity select-none"
+        data-tip="Drag to reorder"
         {...attributes}
         {...listeners}
       >
-        ⠿
+        <i className="ti ti-grip-vertical" style={{ fontSize: '14px' }} />
       </div>
 
       {/* Checkbox + title */}
@@ -146,7 +147,8 @@ export default function TaskRow({ task, onUpdate, onDelete }) {
           />
         ) : (
           <span
-            className={`text-sm truncate select-none ${isDone ? 'text-dark-subtle line-through' : 'text-dark-text hover:underline cursor-pointer'}`}
+            className={`tooltip text-sm truncate select-none ${isDone ? 'text-dark-subtle line-through' : 'text-dark-text hover:underline cursor-pointer'}`}
+            data-tip="Click to open · Double-click to rename"
             onClick={handleTitleClick}
             onDoubleClick={handleTitleDoubleClick}
           >
@@ -209,7 +211,8 @@ export default function TaskRow({ task, onUpdate, onDelete }) {
 
       {/* Priority — click to cycle */}
       <button
-        className={`badge ${priority.cls} cursor-pointer hover:opacity-75 transition-opacity`}
+        className={`tooltip badge ${priority.cls} cursor-pointer hover:opacity-75 transition-opacity`}
+        data-tip="Click to change priority"
         onClick={() => onUpdate({ priority: PRIORITY_CYCLE[task.priority ?? 'normal'] })}
       >
         {priority.label}
@@ -217,10 +220,12 @@ export default function TaskRow({ task, onUpdate, onDelete }) {
 
       {/* Delete */}
       <button
-        className="w-6 h-6 flex items-center justify-center rounded opacity-0 group-hover:opacity-100 hover:bg-dark-elevated text-dark-subtle hover:text-red-400 transition-all text-base leading-none"
+        className="tooltip w-6 h-6 flex items-center justify-center rounded opacity-0 group-hover:opacity-100 hover:bg-dark-elevated text-dark-subtle hover:text-red-400 transition-all"
+        data-tip="Delete task"
+        aria-label="Delete task"
         onClick={onDelete}
       >
-        ×
+        <i className="ti ti-x" style={{ fontSize: '12px' }} />
       </button>
     </div>
   )

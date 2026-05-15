@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useToast } from '../shared/Toast'
 
 const HEALTH = {
   on_track:        { label: 'On track',        badge: 'badge-green' },
@@ -17,7 +18,7 @@ function formatDate(str) {
 
 export default function ClientHeader({ client, stats, onHealthChange }) {
   const navigate = useNavigate()
-  const [copied, setCopied]       = useState(false)
+  const toast    = useToast()
   const [healthOpen, setHealthOpen] = useState(false)
   const healthRef = useRef(null)
 
@@ -42,8 +43,7 @@ export default function ClientHeader({ client, stats, onHealthChange }) {
 
   function copyLink() {
     navigator.clipboard.writeText(`${window.location.origin}/portal/${client.share_token}`)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    toast('Client link copied!', 'success')
   }
 
   return (
@@ -131,7 +131,8 @@ export default function ClientHeader({ client, stats, onHealthChange }) {
 
           {/* Actions */}
           <button className="btn shrink-0" onClick={copyLink}>
-            {copied ? 'Copied!' : 'Client link'}
+            <i className="ti ti-share" style={{ fontSize: '13px' }} />
+            Client link
           </button>
         </div>
       </div>

@@ -116,17 +116,18 @@ export default function ClientBoard() {
               </div>
             )}
 
-            {groups.map(group => (
-              <TaskGroup
-                key={group.id}
-                group={group}
-                onCreateTask={createTask}
-                onUpdateTask={updateTask}
-                onDeleteTask={deleteTask}
-                onReorder={reorderTasks}
-                onUpdateGroup={updateGroup}
-                onDeleteGroup={deleteGroup}
-              />
+            {groups.map((group, i) => (
+              <div key={group.id} className={`animate-fade-up animate-delay-${Math.min(i + 1, 4)}`}>
+                <TaskGroup
+                  group={group}
+                  onCreateTask={createTask}
+                  onUpdateTask={updateTask}
+                  onDeleteTask={deleteTask}
+                  onReorder={reorderTasks}
+                  onUpdateGroup={updateGroup}
+                  onDeleteGroup={deleteGroup}
+                />
+              </div>
             ))}
 
             {/* New group */}

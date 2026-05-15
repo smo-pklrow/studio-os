@@ -62,7 +62,10 @@ export default function ClientRow({ client, onArchive, onEdit, onPause, onHealth
   return (
     <div
       className={`card card-interactive group relative flex items-center gap-4 p-5 ${className}`}
-      style={isPaused ? { borderColor: 'rgba(244,166,35,0.35)', opacity: 0.75 } : {}}
+      style={isPaused
+        ? { borderColor: 'rgba(244,166,35,0.35)', opacity: 0.75 }
+        : { borderLeftColor: accentColor, borderLeftWidth: '3px' }
+      }
       onClick={() => navigate(`/client/${client.id}`)}
     >
       {/* Avatar */}
@@ -160,11 +163,12 @@ export default function ClientRow({ client, onArchive, onEdit, onPause, onHealth
 
       {/* Three-dot menu */}
       <button
-        className="shrink-0 w-7 h-7 flex items-center justify-center rounded-lg opacity-0 group-hover:opacity-100 hover:bg-dark-elevated text-dark-subtle hover:text-dark-muted transition-all"
+        className="tooltip shrink-0 w-7 h-7 flex items-center justify-center rounded-lg opacity-0 group-hover:opacity-100 hover:bg-dark-elevated text-dark-subtle hover:text-dark-muted transition-all"
+        data-tip="More options"
         onClick={e => { e.stopPropagation(); setMenuOpen(v => !v) }}
         aria-label="Client options"
       >
-        <span className="tracking-widest text-sm leading-none select-none">···</span>
+        <i className="ti ti-dots" style={{ fontSize: '16px' }} />
       </button>
 
       {menuOpen && (

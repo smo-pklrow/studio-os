@@ -152,8 +152,10 @@
     border: 1px solid var(--border-default);
     border-radius: var(--radius-lg);
     transition:
-      background-color var(--duration) var(--ease-out),
-      border-color     var(--duration) var(--ease-out);
+      background-color var(--duration)      var(--ease-out),
+      border-color     var(--duration)      var(--ease-out),
+      transform        var(--duration)      var(--ease-out),
+      box-shadow       var(--duration)      var(--ease-out);
   }
 
   .card-elevated {
@@ -167,6 +169,12 @@
   .card-interactive:hover {
     border-color: var(--border-strong);
     background-color: var(--color-elevated);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28), 0 2px 6px rgba(0, 0, 0, 0.18);
+  }
+  .card-interactive:active {
+    transform: translateY(0);
+    box-shadow: none;
   }
 
   /* ----------- Buttons ----------- */
@@ -252,6 +260,76 @@
   .badge-amber { background-color: var(--color-amber-bg); color: var(--color-amber-fg); }
   .badge-red   { background-color: var(--color-red-bg);   color: var(--color-red-fg);   }
   .badge-gray  { background-color: var(--color-elevated); color: var(--color-muted);    }
+
+  /* ----------- Tooltips ----------- */
+  .tooltip {
+    position: relative;
+  }
+  .tooltip::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: var(--color-elevated-hi);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--duration-fast) var(--ease-out);
+    z-index: 101;
+  }
+  .tooltip::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--color-elevated-hi);
+    color: var(--color-text);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    padding: 5px 8px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-strong);
+    box-shadow: var(--shadow-sm);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--duration-fast) var(--ease-out);
+    z-index: 100;
+  }
+  .tooltip:hover::before,
+  .tooltip:hover::after {
+    opacity: 1;
+  }
+
+  /* ----------- Toasts ----------- */
+  .toast-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 10px 14px;
+    border-radius: var(--radius);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    background-color: var(--color-elevated-hi);
+    color: var(--color-text);
+    border: 1px solid var(--border-strong);
+    box-shadow: var(--shadow-md);
+    pointer-events: auto;
+    animation: fade-up 200ms var(--ease-out) both;
+  }
+  .toast-success {
+    background-color: var(--color-green-bg);
+    color: var(--color-green-fg);
+    border-color: var(--color-brand-deep);
+  }
+  .toast-error {
+    background-color: var(--color-red-bg);
+    color: var(--color-red-fg);
+    border-color: #791F1F;
+  }
 
   /* ----------- Progress ----------- */
   .progress-bar {

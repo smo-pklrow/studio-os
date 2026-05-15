@@ -146,13 +146,15 @@ export default function Dashboard() {
           {!loading && !error && clients.length === 0 && (
             <div className="flex flex-col items-center justify-center py-24 text-center animate-fade-in">
               <div
-                className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 text-dark-subtle text-xl select-none"
-                style={{ backgroundColor: 'var(--color-elevated)' }}
+                className="w-14 h-14 rounded-2xl flex items-center justify-center mb-5"
+                style={{ backgroundColor: 'var(--color-brand-deep)', color: 'var(--color-brand-tint)' }}
               >
-                ◈
+                <i className="ti ti-users" style={{ fontSize: '24px' }} />
               </div>
               <p className="text-dark-text text-sm font-medium mb-1">No clients yet</p>
-              <p className="text-dark-muted text-xs mb-6">Add your first client to get started.</p>
+              <p className="text-dark-muted text-xs mb-6 max-w-xs leading-relaxed">
+                Add your first client to start tracking projects, tasks, and sharing a live portal.
+              </p>
               <button className="btn btn-primary btn-lg" onClick={() => setShowAddModal(true)}>
                 + New client
               </button>

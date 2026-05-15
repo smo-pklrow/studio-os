@@ -200,6 +200,161 @@ Common icons in Studio OS:
 
 ---
 
+## UX Guidance Patterns
+
+> These patterns make interactions discoverable without onboarding or instructions. Every interactive element a user might not understand should have at least one of these applied.
+
+---
+
+### Tooltips
+
+**Implementation**: CSS-only via `.tooltip` class + `data-tip` attribute. No JS required.
+
+```jsx
+<button className="tooltip" data-tip="Delete task" aria-label="Delete task">
+  <i className="ti ti-x" />
+</button>
+```
+
+**When to use**:
+- Icon-only buttons (always — no exceptions)
+- Collapsed/ambiguous controls (drag handle, color dot, collapse toggle)
+- Double-click affordances on text ("Double-click to rename")
+- Click-to-cycle controls ("Click to change priority")
+
+**When NOT to use**:
+- Buttons that already have a visible text label
+- Inputs and textareas
+- Badges that are self-explanatory (status names are readable)
+
+**Placement**: Tooltips appear above the element (`bottom: calc(100% + 10px)`). Keep `data-tip` text under 40 characters — it's a hint, not a label.
+
+---
+
+### Toasts
+
+**Implementation**: `useToast()` hook from `src/components/shared/Toast.jsx`. Wrap App in `<ToastProvider>`.
+
+```jsx
+import { useToast } from '../shared/Toast'
+
+const toast = useToast()
+toast('Client link copied!', 'success')   // green
+toast('Failed to save changes', 'error')  // red
+toast('Task deleted')                     // neutral (default)
+```
+
+**Types**: `'success'` (green), `'error'` (red), `'default'` (neutral gray).
+
+**When to use**:
+- Confirming a clipboard copy
+- Confirming a destructive action completed (delete, archive)
+- Surfacing a save error that would otherwise be silent
+
+**When NOT to use**:
+- Inline saves that already have a visible "Saved ✓" indicator
+- Every mutation — toasts are for non-obvious outcomes only
+- Errors the user caused via a form (show inline validation instead)
+
+**Duration**: Auto-dismisses at 3 seconds. No manual dismiss in v1.
+
+---
+
+### Icon-only buttons
+
+Every button with no visible text label must have BOTH:
+1. `aria-label="..."` — for screen readers and developer legibility
+2. `data-tip="..."` + `.tooltip` class — for sighted users who don't know the icon
+
+```jsx
+<button
+  className="tooltip w-6 h-6 ..."
+  data-tip="Delete task"
+  aria-label="Delete task"
+  onClick={onDelete}
+>
+  <i className="ti ti-x" style={{ fontSize: '12px' }} />
+</button>
+```
+
+---
+
+### Hover-reveal controls
+
+Some controls (drag handle, delete button, three-dot menu) are hidden at rest and revealed on row/card hover. This reduces visual noise without hiding functionality.
+
+**Pattern**: Use `opacity-0 group-hover:opacity-100` on the control. The parent must have `group` class.
+
+```jsx
+<div className="group flex items-center ...">
+  <button className="opacity-0 group-hover:opacity-100 tooltip" data-tip="Delete">
+    <i className="ti ti-x" />
+  </button>
+</div>
+```
+
+**When to use**: Actions that are destructive, rarely needed, or secondary to the row's primary interaction.
+
+**When NOT to use**: Primary CTAs, status badges, anything the user will need to find on first visit.
+
+---
+
+### Double-click to edit
+
+Inline editing (task title, group name) is triggered by double-click. Single-click is reserved for navigation or toggle.
+
+**Discoverable via**: `.tooltip` with `data-tip="Double-click to rename"` on the text element.
+
+**Implementation pattern**:
+```jsx
+<span
+  className="tooltip ..."
+  data-tip="Double-click to rename"
+  onDoubleClick={() => { setEditing(true); setValue(item.name) }}
+>
+  {item.name}
+</span>
+```
+
+When editing mode is active: show an `<input autoFocus>` with `onBlur` → save, `Enter` → save, `Escape` → cancel.
+
+---
+
+### Empty states
+
+Every list or canvas that can be empty needs an empty state. Formula:
+
+```
+[Optional icon]
+[Short statement — what's missing]
+[One-line context — why it matters or what to do]
+[Primary action button]
+```
+
+Example (Brain Dump canvas):
+```
+No brain dump cards yet
+Drop thoughts, concepts, and visual ideas here.
+[+ Add card]
+```
+
+**Rules**:
+- Never just blank space — always guide the user toward the first action
+- Keep copy warm and specific to the context (not generic "Nothing here yet")
+- One CTA max — don't offer three ways to proceed
+
+---
+
+### Loading skeletons
+
+Use animated pulse skeletons during async data loads. Never show a spinner for content that has a known shape.
+
+**Pattern**: Replace the real component structure with `<div className="animate-pulse">` containing `div` blocks with `background-color: var(--color-elevated-hi)` and approximate widths/heights.
+
+Skeleton color: `var(--color-elevated-hi)` (`#323230`) against card background `var(--color-surface)` (`#252523`) — subtle but visible.
+
+---
+
 ## Animation
 
 All animations use CSS keyframes. No JS animation libraries.

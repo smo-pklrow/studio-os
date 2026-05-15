@@ -69,8 +69,9 @@ export default function TaskGroup({ group, onCreateTask, onUpdateTask, onDeleteT
         {/* Color dot — click for color picker */}
         <div ref={colorRef} className="relative shrink-0">
           <button
-            className="w-2.5 h-2.5 rounded-full hover:scale-125 transition-transform focus:outline-none"
+            className="tooltip w-2.5 h-2.5 rounded-full hover:scale-125 transition-transform focus:outline-none"
             style={{ backgroundColor: group.color }}
+            data-tip="Change color"
             onClick={() => setColorOpen(v => !v)}
             aria-label="Change group color"
           />
@@ -107,9 +108,9 @@ export default function TaskGroup({ group, onCreateTask, onUpdateTask, onDeleteT
           />
         ) : (
           <h3
-            className="text-dark-text font-medium text-sm select-none cursor-default"
+            className="tooltip text-dark-text font-medium text-sm select-none cursor-default"
+            data-tip="Double-click to rename"
             onDoubleClick={() => { setRenaming(true); setNameValue(group.name) }}
-            title="Double-click to rename"
           >
             {group.name}
           </h3>
@@ -145,21 +146,23 @@ export default function TaskGroup({ group, onCreateTask, onUpdateTask, onDeleteT
         {/* Delete trigger — appears on header hover */}
         {!deleteConfirm && !renaming && (
           <button
-            className="opacity-0 group-hover:opacity-100 w-5 h-5 flex items-center justify-center text-dark-subtle hover:text-red-400 transition-all text-sm leading-none"
+            className="tooltip opacity-0 group-hover:opacity-100 w-5 h-5 flex items-center justify-center text-dark-subtle hover:text-red-400 transition-all"
+            data-tip="Delete group"
             onClick={() => setDeleteConfirm(true)}
             aria-label="Delete group"
           >
-            ×
+            <i className="ti ti-x" style={{ fontSize: '12px' }} />
           </button>
         )}
 
         {/* Collapse toggle */}
         <button
-          className="text-dark-subtle hover:text-dark-muted transition-colors text-xs w-6 h-6 flex items-center justify-center"
+          className="tooltip text-dark-subtle hover:text-dark-muted transition-colors w-6 h-6 flex items-center justify-center"
+          data-tip={collapsed ? 'Expand' : 'Collapse'}
           onClick={() => setCollapsed(v => !v)}
           aria-label={collapsed ? 'Expand group' : 'Collapse group'}
         >
-          {collapsed ? '▸' : '▾'}
+          <i className={`ti ${collapsed ? 'ti-chevron-right' : 'ti-chevron-down'}`} style={{ fontSize: '13px' }} />
         </button>
       </div>
 
