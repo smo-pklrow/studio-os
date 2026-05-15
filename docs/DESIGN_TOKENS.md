@@ -355,17 +355,91 @@ Skeleton color: `var(--color-elevated-hi)` (`#323230`) against card background `
 
 ---
 
+## Smooth Scroll
+
+Lenis (`lenis` npm package) is initialized globally in `src/App.jsx` and handles all window-level scrolling. It gives the app a weighted, physical scroll feel.
+
+**Config**:
+```js
+const lenis = new Lenis({
+  duration: 1.1,
+  easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+})
+```
+
+**Required CSS** (added to `index.css` before `@layer base`):
+```css
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+```
+
+**Scoping**: Lenis handles the window scroll only. Child elements with `overflow: auto` (modals, WeekCalendar horizontal scroll) are unaffected. Add `data-lenis-prevent` to any scrollable child that should opt out.
+
+---
+
+## Dashboard Greeting Pattern
+
+The dashboard header uses a time-aware, name-personalized greeting at display scale — the primary typographic statement in the app.
+
+**Scale**: `clamp(22px, 3vw, 30px)`, `font-weight: 500`, `letter-spacing: -0.01em`. This is the largest text in the app by design — it creates the hierarchy contrast that makes body text feel intimate.
+
+**Greeting logic**:
+```js
+function getGreeting(name) {
+  const hour = new Date().getHours()
+  const time = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening'
+  return `Good ${time}${name ? `, ${name}` : ''}.`
+}
+```
+
+**Insight line**: A single sentence surfacing the most important studio state (overdue tasks > clients needing attention > all clear). Never more than one sentence. Never raw counts ("3 clients") — always outcome language ("3 clients need attention").
+
+**Name source**: `user.user_metadata.full_name` from `supabase.auth.getUser()`, split to first name only. Falls back to the formatted date string if name is unavailable.
+
+---
+
+## Onboarding Nudge Pattern
+
+Dismissible inline banners that surface the app's key differentiators at the exact moment they become relevant.
+
+**Rules**:
+- Show only once (dismissed state stored in `localStorage`)
+- Must be immediately actionable (a button that does the thing, not a link to learn about it)
+- One nudge maximum visible at a time
+- Dismiss without friction — an `×` button, no confirmation
+
+**Portal nudge** — shown when `clients.length >= 1` and not yet dismissed:
+```jsx
+{showNudge && (
+  <div style={{ backgroundColor: 'var(--color-brand-deep)', border: '1px solid var(--border-brand)' }}>
+    <i className="ti ti-share" />
+    <span>Share your client portal</span> — give your client a live view.
+    <button onClick={shareFirstPortal}>Copy link</button>
+    <button onClick={dismissNudge}><i className="ti ti-x" /></button>
+  </div>
+)}
+```
+
+**localStorage key**: `'portal-nudge-dismissed'` = `'true'`
+
+---
+
 ## Animation
 
-All animations use CSS keyframes. No JS animation libraries.
+Lenis handles scroll. All entrance animations use CSS keyframes with custom easing.
 
 | Name | Duration | Usage |
 |---|---|---|
-| `fadeInUp` | `240ms ease-out` | Card/modal entrance |
-| `fadeIn` | `180ms ease-out` | Dropdowns, tooltips |
-| `pulse` (subtle) | `2s ease-in-out infinite` | DigestStrip unread indicator |
+| `animate-fade-up` | `540ms var(--ease-out)` | Card/row entrance, staggered with `animate-delay-{1-4}` |
+| `animate-fade-in` | `360ms var(--ease-out)` | Modals, dropdowns, empty states |
+| `animate-pulse` | Tailwind default | Loading skeletons |
+| `animate-pulse-glow` | `5.2s var(--ease-in-out) infinite` | DigestStrip unread indicator |
 
-Motion reduction: all keyframe animations are wrapped in `@media (prefers-reduced-motion: no-preference)` or use `transition` properties that browsers auto-respect.
+**Stagger delays**: `animate-delay-1` (80ms) through `animate-delay-4` (320ms). Pass via `className` prop from parent when mapping over lists.
+
+Motion reduction: all keyframe animations are wrapped in `@media (prefers-reduced-motion: reduce)` — they collapse to `0.01ms` so content is still accessible.
 
 ---
 

@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useClients } from '../hooks/useClients'
+import { supabase } from '../lib/supabase'
+import { useToast } from '../components/shared/Toast'
 import ClientRow from '../components/clients/ClientRow'
 import AddClientModal from '../components/clients/AddClientModal'
 import EditClientModal from '../components/clients/EditClientModal'
@@ -54,12 +56,44 @@ function formatHeaderDate() {
   })
 }
 
+function getGreeting(name) {
+  const hour = new Date().getHours()
+  const time = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening'
+  return `Good ${time}${name ? `, ${name}` : ''}.`
+}
+
+function getInsight(clients) {
+  if (clients.length === 0) return formatHeaderDate()
+  const totalOverdue = clients.reduce((sum, c) => sum + (c._stats?.overdue ?? 0), 0)
+  const needsAttention = clients.filter(c => c.health === 'needs_attention' || c.health === 'blocked').length
+  if (totalOverdue > 0) return `${totalOverdue} overdue task${totalOverdue !== 1 ? 's' : ''} across your clients.`
+  if (needsAttention > 0) return `${needsAttention} client${needsAttention !== 1 ? 's' : ''} need${needsAttention === 1 ? 's' : ''} attention.`
+  return `All ${clients.length} client${clients.length !== 1 ? 's' : ''} on track.`
+}
+
 export default function Dashboard() {
   const { clients, loading, error, globalStats, createClient, archiveClient, updateClient, pauseClient } = useClients()
+  const toast = useToast()
   const [showAddModal, setShowAddModal]   = useState(false)
   const [editingClient, setEditingClient] = useState(null)
   const [search, setSearch]               = useState('')
   const [healthFilter, setHealthFilter]   = useState('')
+  const [firstName, setFirstName]         = useState(null)
+  const [nudgeDismissed, setNudgeDismissed] = useState(
+    () => localStorage.getItem('portal-nudge-dismissed') === 'true'
+  )
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      const name = user?.user_metadata?.full_name ?? user?.user_metadata?.name
+      if (name) setFirstName(name.split(' ')[0])
+    })
+  }, [])
+
+  function dismissNudge() {
+    localStorage.setItem('portal-nudge-dismissed', 'true')
+    setNudgeDismissed(true)
+  }
 
   const filtered = clients.filter(c => {
     const matchesSearch = !search || c.name.toLowerCase().includes(search.toLowerCase())
@@ -68,22 +102,36 @@ export default function Dashboard() {
   })
 
   const hasFilters = search || healthFilter
+  const showNudge  = !nudgeDismissed && !loading && clients.length >= 1
+
+  function shareFirstPortal() {
+    const first = filtered[0] ?? clients[0]
+    if (!first?.share_token) return
+    navigator.clipboard.writeText(`${window.location.origin}/portal/${first.share_token}`)
+    toast('Client portal link copied!', 'success')
+    dismissNudge()
+  }
 
   return (
     <div className="flex flex-col flex-1">
 
       {/* ── Header ─────────────────────────────────────────────── */}
       <header className="border-b" style={{ borderColor: 'var(--border-subtle)' }}>
-        <div className="max-w-5xl mx-auto w-full px-6 py-4 flex items-center justify-between">
-          <div>
-            <p className="text-dark-text text-sm font-medium">{formatHeaderDate()}</p>
+        <div className="max-w-5xl mx-auto w-full px-6 py-6 flex items-end justify-between gap-4">
+          <div className="animate-fade-up">
+            <h1
+              className="font-medium leading-tight mb-1"
+              style={{ fontSize: 'clamp(22px, 3vw, 30px)', color: 'var(--color-text)', letterSpacing: '-0.01em' }}
+            >
+              {firstName ? getGreeting(firstName) : formatHeaderDate()}
+            </h1>
             {!loading && (
-              <p className="text-dark-muted text-xs mt-0.5">
-                {clients.length} active client{clients.length !== 1 ? 's' : ''}
+              <p className="text-sm" style={{ color: 'var(--color-muted)' }}>
+                {getInsight(clients)}
               </p>
             )}
           </div>
-          <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
+          <button className="btn btn-primary shrink-0" onClick={() => setShowAddModal(true)}>
             + New client
           </button>
         </div>
@@ -96,6 +144,38 @@ export default function Dashboard() {
         <DigestStrip />
 
         {loading ? <StatsBarSkeleton /> : !error && <StatsBar stats={globalStats} />}
+
+        {/* Portal nudge — shown until dismissed */}
+        {showNudge && (
+          <div
+            className="flex items-center gap-3 rounded-xl px-4 py-3 animate-fade-up"
+            style={{
+              backgroundColor: 'var(--color-brand-deep)',
+              border: '1px solid var(--border-brand)',
+            }}
+          >
+            <i className="ti ti-share shrink-0" style={{ color: 'var(--color-brand-tint)', fontSize: '16px' }} />
+            <div className="flex-1 min-w-0 text-sm">
+              <span style={{ color: 'var(--color-brand-tint)', fontWeight: 500 }}>Share your client portal</span>
+              <span style={{ color: 'var(--color-muted)' }}> — give your client a live view of their project. No login required.</span>
+            </div>
+            <button
+              className="btn btn-primary shrink-0 text-xs"
+              style={{ height: '28px', padding: '0 10px' }}
+              onClick={shareFirstPortal}
+            >
+              Copy link
+            </button>
+            <button
+              className="shrink-0 w-6 h-6 flex items-center justify-center rounded hover:bg-dark-elevated transition-colors"
+              style={{ color: 'var(--color-muted)' }}
+              onClick={dismissNudge}
+              aria-label="Dismiss"
+            >
+              <i className="ti ti-x" style={{ fontSize: '12px' }} />
+            </button>
+          </div>
+        )}
 
         {/* Client list */}
         <section>
