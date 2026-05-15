@@ -16,6 +16,8 @@ const PRIORITY_STYLE = {
   low:    { label: 'Low',    cls: 'badge-gray'  },
 }
 
+const PRIORITY_CYCLE = { normal: 'high', high: 'low', low: 'normal' }
+
 function getStatusStyle(value) {
   return STATUS_OPTIONS.find(s => s.value === value) ?? STATUS_OPTIONS[0]
 }
@@ -36,8 +38,12 @@ function getDueState(task) {
 export default function TaskRow({ task, onUpdate, onDelete }) {
   const { clientId } = useParams()
   const navigate = useNavigate()
-  const [statusOpen, setStatusOpen] = useState(false)
-  const statusRef = useRef(null)
+  const [statusOpen, setStatusOpen]   = useState(false)
+  const [dateEditing, setDateEditing] = useState(false)
+  const [titleEditing, setTitleEditing] = useState(false)
+  const [titleValue, setTitleValue]   = useState('')
+  const statusRef  = useRef(null)
+  const navTimer   = useRef(null)
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: task.id })
 
@@ -50,10 +56,42 @@ export default function TaskRow({ task, onUpdate, onDelete }) {
     return () => document.removeEventListener('mousedown', handle)
   }, [statusOpen])
 
-  const isDone = task.status === 'done'
-  const status = getStatusStyle(task.status)
+  useEffect(() => {
+    return () => { if (navTimer.current) clearTimeout(navTimer.current) }
+  }, [])
+
+  const isDone   = task.status === 'done'
+  const status   = getStatusStyle(task.status)
   const priority = PRIORITY_STYLE[task.priority] ?? PRIORITY_STYLE.normal
   const dueState = getDueState(task)
+
+  function handleTitleClick() {
+    if (navTimer.current) {
+      clearTimeout(navTimer.current)
+      navTimer.current = null
+      return
+    }
+    navTimer.current = setTimeout(() => {
+      navTimer.current = null
+      navigate(`/client/${clientId}/task/${task.id}`)
+    }, 280)
+  }
+
+  function handleTitleDoubleClick() {
+    if (navTimer.current) {
+      clearTimeout(navTimer.current)
+      navTimer.current = null
+    }
+    setTitleEditing(true)
+    setTitleValue(task.title)
+  }
+
+  function handleTitleSave() {
+    if (titleValue.trim() && titleValue.trim() !== task.title) {
+      onUpdate({ title: titleValue.trim() })
+    }
+    setTitleEditing(false)
+  }
 
   return (
     <div
@@ -91,12 +129,30 @@ export default function TaskRow({ task, onUpdate, onDelete }) {
             </svg>
           )}
         </button>
-        <span
-          className={`text-sm truncate cursor-pointer hover:underline ${isDone ? 'text-dark-subtle line-through' : 'text-dark-text'}`}
-          onClick={() => navigate(`/client/${clientId}/task/${task.id}`)}
-        >
-          {task.title}
-        </span>
+
+        {titleEditing ? (
+          <input
+            autoFocus
+            className="flex-1 min-w-0 text-sm text-dark-text bg-transparent border-b border-brand-green focus:outline-none"
+            value={titleValue}
+            onChange={e => setTitleValue(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter') handleTitleSave()
+              if (e.key === 'Escape') { setTitleEditing(false); setTitleValue(task.title) }
+            }}
+            onBlur={handleTitleSave}
+            onClick={e => e.stopPropagation()}
+            onPointerDown={e => e.stopPropagation()}
+          />
+        ) : (
+          <span
+            className={`text-sm truncate select-none ${isDone ? 'text-dark-subtle line-through' : 'text-dark-text hover:underline cursor-pointer'}`}
+            onClick={handleTitleClick}
+            onDoubleClick={handleTitleDoubleClick}
+          >
+            {task.title}
+          </span>
+        )}
       </div>
 
       {/* Status dropdown */}
@@ -122,17 +178,42 @@ export default function TaskRow({ task, onUpdate, onDelete }) {
         )}
       </div>
 
-      {/* Due date */}
-      <span className={`text-xs tabular-nums ${
-        dueState === 'overdue' || dueState === 'today'
-          ? 'text-amber-400 font-medium'
-          : 'text-dark-muted'
-      }`}>
-        {formatDue(task.due_date) ?? '—'}
-      </span>
+      {/* Due date — click to open date picker */}
+      <div>
+        {dateEditing ? (
+          <input
+            type="date"
+            autoFocus
+            className="w-[88px] bg-dark-elevated border border-brand-green rounded px-1.5 py-0.5 text-xs text-dark-text focus:outline-none"
+            defaultValue={task.due_date ?? ''}
+            onChange={e => {
+              onUpdate({ due_date: e.target.value || null })
+              setDateEditing(false)
+            }}
+            onBlur={() => setDateEditing(false)}
+            onKeyDown={e => e.key === 'Escape' && setDateEditing(false)}
+          />
+        ) : (
+          <span
+            className={`text-xs tabular-nums cursor-pointer hover:underline ${
+              dueState === 'overdue' || dueState === 'today'
+                ? 'text-amber-400 font-medium'
+                : 'text-dark-muted'
+            }`}
+            onClick={() => setDateEditing(true)}
+          >
+            {formatDue(task.due_date) ?? '—'}
+          </span>
+        )}
+      </div>
 
-      {/* Priority */}
-      <span className={`badge ${priority.cls}`}>{priority.label}</span>
+      {/* Priority — click to cycle */}
+      <button
+        className={`badge ${priority.cls} cursor-pointer hover:opacity-75 transition-opacity`}
+        onClick={() => onUpdate({ priority: PRIORITY_CYCLE[task.priority ?? 'normal'] })}
+      >
+        {priority.label}
+      </button>
 
       {/* Delete */}
       <button

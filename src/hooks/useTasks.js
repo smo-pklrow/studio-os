@@ -89,5 +89,22 @@ export function useTasks(clientId) {
     )
   }
 
-  return { groups, loading, error, createGroup, createTask, updateTask, deleteTask, reorderTasks }
+  async function updateGroup(groupId, fields) {
+    const { data, error } = await supabase
+      .from('task_groups')
+      .update(fields)
+      .eq('id', groupId)
+      .select()
+      .single()
+    if (!error) setGroups(prev => prev.map(g => g.id === groupId ? { ...g, ...data } : g))
+    return { data, error }
+  }
+
+  async function deleteGroup(groupId) {
+    const { error } = await supabase.from('task_groups').delete().eq('id', groupId)
+    if (!error) setGroups(prev => prev.filter(g => g.id !== groupId))
+    return { error }
+  }
+
+  return { groups, loading, error, createGroup, createTask, updateTask, deleteTask, reorderTasks, updateGroup, deleteGroup }
 }

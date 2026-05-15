@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 const HEALTH = {
@@ -8,14 +8,27 @@ const HEALTH = {
   nearly_done:     { label: 'Nearly done',      badge: 'badge-blue'  },
 }
 
+const HEALTH_ORDER = ['on_track', 'needs_attention', 'blocked', 'nearly_done']
+
 function formatDate(str) {
   if (!str) return null
   return new Date(str + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
-export default function ClientHeader({ client, stats }) {
+export default function ClientHeader({ client, stats, onHealthChange }) {
   const navigate = useNavigate()
-  const [copied, setCopied] = useState(false)
+  const [copied, setCopied]       = useState(false)
+  const [healthOpen, setHealthOpen] = useState(false)
+  const healthRef = useRef(null)
+
+  useEffect(() => {
+    if (!healthOpen) return
+    function handle(e) {
+      if (healthRef.current && !healthRef.current.contains(e.target)) setHealthOpen(false)
+    }
+    document.addEventListener('mousedown', handle)
+    return () => document.removeEventListener('mousedown', handle)
+  }, [healthOpen])
 
   if (!client) return (
     <div className="border-b px-6 py-5" style={{ borderColor: 'var(--border-subtle)' }}>
@@ -23,8 +36,8 @@ export default function ClientHeader({ client, stats }) {
     </div>
   )
 
-  const health = HEALTH[client.health] ?? HEALTH.on_track
-  const percent = stats.total > 0 ? Math.round((stats.done / stats.total) * 100) : 0
+  const health      = HEALTH[client.health] ?? HEALTH.on_track
+  const percent     = stats.total > 0 ? Math.round((stats.done / stats.total) * 100) : 0
   const accentColor = client.color || '#1D9E75'
 
   function copyLink() {
@@ -74,9 +87,38 @@ export default function ClientHeader({ client, stats }) {
                 {client.name}{client.project_name && ` — ${client.project_name}`}
               </h1>
               <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                <span className={`badge ${health.badge}`}>
-                  {health.label}{stats.total > 0 && ` · ${percent}%`}
-                </span>
+
+                {/* Health badge — clickable dropdown */}
+                <div className="relative" ref={healthRef}>
+                  <button
+                    className={`badge ${health.badge} cursor-pointer hover:opacity-80 transition-opacity`}
+                    onClick={() => setHealthOpen(v => !v)}
+                  >
+                    {health.label}{stats.total > 0 && ` · ${percent}%`}
+                  </button>
+
+                  {healthOpen && (
+                    <div className="absolute left-0 top-7 card card-elevated z-10 min-w-[168px] py-1">
+                      {HEALTH_ORDER.map(key => {
+                        const h = HEALTH[key]
+                        return (
+                          <button
+                            key={key}
+                            className="w-full text-left px-3 py-2 text-xs hover:bg-dark-elevated transition-colors flex items-center gap-2"
+                            onClick={() => {
+                              setHealthOpen(false)
+                              if (key !== client.health) onHealthChange?.(key)
+                            }}
+                          >
+                            <span className={`badge ${h.badge}`}>{h.label}</span>
+                            {key === client.health && <span className="text-dark-subtle ml-auto">✓</span>}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
+
                 {client.start_date && (
                   <span className="text-dark-muted text-xs">Started {formatDate(client.start_date)}</span>
                 )}

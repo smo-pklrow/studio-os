@@ -19,8 +19,8 @@ export default function ClientBoard() {
   const [addingGroup, setAddingGroup] = useState(false)
   const [newGroupName, setNewGroupName] = useState('')
 
-  const { client } = useClient(clientId)
-  const { groups, loading, createGroup, createTask, updateTask, deleteTask, reorderTasks } = useTasks(clientId)
+  const { client, updateClient } = useClient(clientId)
+  const { groups, loading, createGroup, createTask, updateTask, deleteTask, reorderTasks, updateGroup, deleteGroup } = useTasks(clientId)
   const { cards, createCard, updateCard, deleteCard } = useBrainDump(clientId)
 
   const allTasks = groups.flatMap(g => g.tasks)
@@ -48,7 +48,7 @@ export default function ClientBoard() {
   return (
     <div className="flex flex-col flex-1">
 
-      <ClientHeader client={client} stats={stats} />
+      <ClientHeader client={client} stats={stats} onHealthChange={health => updateClient({ health })} />
 
       {/* Tab bar */}
       <div className="border-b" style={{ borderColor: 'var(--border-subtle)' }}>
@@ -94,6 +94,8 @@ export default function ClientBoard() {
                 onUpdateTask={updateTask}
                 onDeleteTask={deleteTask}
                 onReorder={reorderTasks}
+                onUpdateGroup={updateGroup}
+                onDeleteGroup={deleteGroup}
               />
             ))}
 

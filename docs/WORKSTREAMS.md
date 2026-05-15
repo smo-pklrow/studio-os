@@ -71,7 +71,7 @@
 
 ---
 
-## Stream D — Dashboard (Level 1) Gaps `[IN PROGRESS]`
+## Stream D — Dashboard (Level 1) Gaps `[COMPLETE]`
 
 **Scope**: Client edit, health selector, pause flow, search/filter
 **Files**: `src/pages/Dashboard.jsx`, `src/components/clients/`
@@ -79,20 +79,17 @@
 
 ### Done
 - [x] Client list rows with progress bars, health badges, stats
-- [x] Add client modal (name, project, color, logo)
+- [x] Add client modal (name, project, color, logo, health, start date, due date)
 - [x] Archive client flow
 - [x] Stats bar (live from DB)
 - [x] Week calendar strip (UI shell)
 - [x] Morning digest strip (UI shell)
-
-### Remaining
-- [ ] Edit client modal — pre-fills all fields; saves via `updateClient`
-- [ ] "Edit" in ClientRow three-dot menu
-- [ ] Health badge click → dropdown to change health
-- [ ] Pause client (`status: paused`) — muted visual treatment in list
-- [ ] Start date + due date in AddClientModal
-- [ ] Search / filter bar — filter by name or health
-- [ ] Empty state polish
+- [x] Edit client modal — pre-fills all fields; saves via `updateClient` with optional logo upload
+- [x] "Edit" in ClientRow three-dot menu
+- [x] Health badge click → dropdown to change health inline
+- [x] Pause client (`status: paused`) — amber border + opacity treatment
+- [x] Search / filter bar — filter by name + health dropdown
+- [x] Empty state polish — "No clients yet" vs "No clients match" states
 
 ---
 
@@ -128,17 +125,26 @@
 **Dependencies**: Streams A, D, E
 
 ### Tasks
-- [ ] `useTaskDetail.js` — fetch task + subtasks + notes + files + inspo_items
-- [ ] Two-column layout — left: content, right: sidebar
+
+**Left column**
+- [ ] `useTaskDetail.js` — fetch task + subtasks + notes + files + inspo_items + task_links
+- [ ] Two-column layout — left: content, right: sidebar cards
 - [ ] Breadcrumb — All clients › Client › Group › Task
 - [ ] Editable task title (large heading, click to edit)
-- [ ] Status pill + due date + priority in header row
+- [ ] Status pill + due date + priority chips in header row — each clickable
 - [ ] Description textarea (click to edit, saves on blur)
 - [ ] Subtasks — add / check / delete; stored in `subtasks` table
-- [ ] Notes — timestamped; stored in `notes` table
-- [ ] Files — upload to `task-files` bucket; list + delete
-- [ ] Inspo board — image/link/note tiles; stored in `inspo_items`; drag to reorder
-- [ ] Claude panel shell — placeholder (wired in Phase 3)
+- [ ] Notes — timestamped freetext; stored in `notes` table; "Add note" textarea
+- [ ] Claude panel shell — placeholder card "Claude knows this client · Phase 3"
+
+**Right sidebar cards**
+- [ ] Linked calendar card — Phase 3 shell; static placeholder until Calendar MCP wired
+- [ ] Gmail threads card — manually linked; "Link thread" form (URL + label); stored in `task_links`
+- [ ] Inspo board card — image / link / note tiles; stored in `inspo_items`; drag to reorder
+- [ ] Files card — upload to `task-files` bucket; list filename + size + date; delete
+
+**Schema**
+- [ ] Migration 004: `task_links` table (id, task_id, url, label, created_at); any missing task detail columns
 
 ---
 
@@ -161,20 +167,59 @@
 
 ## Stream H — Intelligence Layer (Phase 3) `[NOT STARTED]`
 
-**Scope**: Claude-powered features — the blue ocean differentiation
-**Files**: `supabase/functions/`, `src/components/layout/DigestStrip.jsx`
+**Scope**: Claude Managed Agents + all AI-powered features — the blue ocean differentiation
+**Files**: `supabase/functions/`, `src/components/layout/DigestStrip.jsx`, `src/pages/TaskDetail.jsx`
 **Dependencies**: All Phase 2 streams complete
 
+### Architecture
+One **Claude Managed Agent** per client (Anthropic infrastructure, 2026). Replaces n8n/Make/custom schedulers. Persistent memory per client built in. Webhooks fire into agents; agents read + write Supabase and live integrations.
+
+> **Live connections**: Google Calendar (MCP, read + write) and Buffer (API).  
+> **No Gmail API** — Gmail threads in TaskDetail are manually linked URLs only.  
+> **Figma** — URL-linking only; opens natively.
+
 ### Tasks
-- [ ] Edge Function: `/weekly-digest` — reads all tasks + brain dump for user; returns briefing bullets
-- [ ] Edge Function: `/generate-brief` — brain dump cards → structured client brief
-- [ ] Edge Function: `/auto-tag` — brain dump entries → theme tags
-- [ ] Wire `DigestStrip` to `/weekly-digest` (replace shell with real data)
+
+**3A — Agent setup**
+- [ ] Provision one Claude Managed Agent per client
+- [ ] Wire memory feeds: brain dump, tasks, notes, files
+
+**3B — Automated runs**
+- [ ] Daily 7am — morning digest → DigestStrip
+- [ ] Mon 7am — weekly priorities email to studio owner
+- [ ] Task → Done trigger — agent suggests next action
+- [ ] Deadline 3d — flag card + write Calendar reminder via MCP
+
+**3C — Google Calendar MCP**
+- [ ] Connect Google Calendar MCP on Anthropic infra
+- [ ] Due dates push to calendar on change
+- [ ] Live events appear in Level 1 WeekCalendar
+- [ ] Linked calendar sidebar card in TaskDetail wired (replaces shell)
+
+**3D — AI Brief + Smart Tools**
+- [ ] Edge Function: `/generate-brief` — brain dump → client brief
+- [ ] Edge Function: `/auto-tag` — brain dump → theme tags
 - [ ] Brief preview modal in ClientBoard brain dump tab
 - [ ] AI tag chips on brain dump cards
-- [ ] "Extract action items" in TaskDetail notes (Claude reads notes → calendar items)
-- [ ] Claude panel in TaskDetail (context from brain dump + history)
-- [ ] Digest scheduling + notifications
+- [ ] Extract action items from notes → calendar items
+
+**3E — Claude panel (TaskDetail)**
+- [ ] Wire Claude panel — context from brain dump + notes + client memory
+- [ ] Proactive message + action buttons ("Draft 3 directions ↗")
+- [ ] Actions call Managed Agent with task context
+
+**3F — Buffer**
+- [ ] Connect Buffer API
+- [ ] Queued posts visible per client board
+- [ ] Draft post action via Claude panel → Buffer queue
+
+**3G — Figma links**
+- [ ] `figma_url text` column on `tasks` table (migration)
+- [ ] Figma link field in TaskDetail sidebar
+
+**3H — Scheduling**
+- [ ] Connect Settings digest time to automated run schedule
+- [ ] Email delivery for weekly digest
 
 ---
 
@@ -187,5 +232,4 @@
 - [ ] Time tracking per task (log hours; roll up per client)
 - [ ] Invoice PDF generator (from logged hours + client rate)
 - [ ] Proposal template builder (brief → project scope)
-- [ ] Google Calendar sync (task due dates ↔ calendar events; feeds WeekCalendar)
 - [ ] Subcontractor support (re-enable task_assignments RLS; invite flow)

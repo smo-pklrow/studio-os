@@ -2,7 +2,7 @@
 
 > Update this file after every session. Mark tasks `[x]` when complete. Add blockers inline.
 
-**Current phase**: Phase 2 — Core UX Completion (2B done → 2C next)
+**Current phase**: Phase 2 — Core UX Completion (2C done → 2D next)
 **Last updated**: 2026-05-15
 
 ---
@@ -48,17 +48,17 @@ Items are ordered by build priority. Do not skip ahead — each group unblocks t
 
 ---
 
-### 2C — Level 2 Task Board Gaps `[NEXT — current]`
+### 2C — Level 2 Task Board Gaps `[COMPLETE]`
 
 > Core daily-use gaps. The board is incomplete without these.
 
-- [ ] Due date picker on TaskRow — inline date input; updates `tasks.due_date` on change
-- [ ] Task title inline edit — double-click title on TaskRow to edit in place; Enter saves, Escape cancels
-- [ ] Group rename — double-click group name to edit inline
-- [ ] Group color picker — click group dot to change color from a swatch palette
-- [ ] Group delete — with confirmation; deletes all tasks in the group
-- [ ] Health / status editor in ClientHeader — click health badge to open dropdown and change `clients.health`
-- [ ] Priority selector on TaskRow — click priority badge to cycle (normal → high → low → normal)
+- [x] Due date picker on TaskRow — click due date text → inline date input; updates `tasks.due_date` on change
+- [x] Task title inline edit — double-click title on TaskRow to edit in place; Enter saves, Escape cancels
+- [x] Group rename — double-click group name to edit inline
+- [x] Group color picker — click group dot to change color from a swatch palette
+- [x] Group delete — with confirmation inline in header; deletes all tasks in the group
+- [x] Health / status editor in ClientHeader — click health badge to open dropdown and change `clients.health`
+- [x] Priority selector on TaskRow — click priority badge to cycle (normal → high → low → normal)
 
 ---
 
@@ -66,20 +66,25 @@ Items are ordered by build priority. Do not skip ahead — each group unblocks t
 
 > Completes the drill-down. Clicking a task title currently leads nowhere.
 
-- [ ] Page layout — two-column: left (title, status, description, subtasks, notes), right sidebar (due date, priority, files, inspo board)
+**Left column (main content)**
+- [ ] Page layout — two-column: left (title, status, description, subtasks, notes, Claude panel), right (sidebar cards)
 - [ ] Breadcrumb — All clients › Client name › Group name › Task title
 - [ ] Task title — large editable heading (click to edit inline)
-- [ ] Status pill — click to change (same dropdown as TaskRow)
-- [ ] Due date picker — date input in sidebar
-- [ ] Priority selector — dropdown in sidebar
+- [ ] Status pill + due date + priority — row of chips at top; each clickable
 - [ ] Description — plain textarea, click to edit, saves on blur
 - [ ] Subtasks — add / check-off / delete; stored in `subtasks` table
-- [ ] Notes — timestamped freetext notes stored in `notes` table; "Add note" button
-- [ ] Files — upload to Supabase Storage `task-files` bucket; list filename + size; delete
-- [ ] Inspo board — image / link / note tiles; stored in `inspo_items`; drag to reorder
-- [ ] `useTaskDetail` hook — fetches task + subtasks + notes + files + inspo_items by task ID
-- [ ] Claude panel shell — placeholder card "Claude knows this client · Phase 3" (wired in Phase 3)
-- [ ] Schema migration for any missing columns — `supabase/migrations/004_task_detail.sql`
+- [ ] Notes — timestamped freetext notes stored in `notes` table; "Add note" textarea
+- [ ] Claude panel shell — placeholder card "Claude knows this client · Phase 3" with muted description (wired in Phase 3)
+
+**Right sidebar (stacked cards)**
+- [ ] Linked calendar card — Phase 3 shell; shows placeholder "Connect calendar in Phase 3"
+- [ ] Gmail threads card — manually linked email threads; "Link thread" opens a small form (URL + label); stored in `task_links` table; shows thread title + date; delete option
+- [ ] Inspo board card — image / link / note tiles; stored in `inspo_items`; drag to reorder; "drag to reorder" label
+- [ ] Files card — upload to Supabase Storage `task-files` bucket; list filename + size + date; delete
+
+**Data + schema**
+- [ ] `useTaskDetail` hook — fetches task + subtasks + notes + files + inspo_items + task_links by task ID
+- [ ] Schema migration — `supabase/migrations/004_task_detail.sql` — add `task_links` table (id, task_id, url, label, created_at); any missing task detail columns
 
 ---
 
@@ -138,19 +143,76 @@ Items are ordered by build priority. Do not skip ahead — each group unblocks t
 
 ## Phase 3 — Intelligence Layer `[NOT STARTED]`
 
-> This is the blue ocean. Everything below is what makes Studio OS different from Notion + Linear.
-> Build after Phase 2 is fully complete and stable.
+> The blue ocean. Build after Phase 2 is fully complete and stable.
+> Architecture: **Claude Managed Agents** (Anthropic infrastructure, 2026) — one agent per client, persistent memory built in. Replaces n8n, Make, and custom Edge Function schedulers. Webhooks fire into agents; agents read + write Supabase and live integrations.
 
-- [ ] Edge Function: `/weekly-digest` — Claude reads all tasks + brain dump; returns bullet-point briefing
-- [ ] Edge Function: `/generate-brief` — Claude turns brain dump cards into a structured client brief
-- [ ] Edge Function: `/auto-tag` — Claude tags brain dump entries by theme (brand, copy, visual, strategy, etc.)
-- [ ] Morning digest wired — `DigestStrip` calls `/weekly-digest`, caches result, shows real bullets
-- [ ] Digest scheduling — send digest email (or in-app) at configured day/time
-- [ ] Brief preview modal — trigger from ClientBoard brain dump tab; shows Claude's generated brief; copy / export
-- [ ] AI tag chips on brain dump cards — displayed after `/auto-tag` runs
-- [ ] "Extract action items" from notes (seen in Level 3 mockup) — Claude reads task notes, returns calendar items
-- [ ] Claude panel in TaskDetail — context loaded from brain dump + notes; shows proactive suggestions + action buttons
-- [ ] Notification preferences wired — connect Settings digest time to Edge Function scheduling
+---
+
+### 3A — Claude Managed Agent Setup
+
+- [ ] Provision one Claude Managed Agent per client (Anthropic dashboard)
+- [ ] Wire agent memory feeds: brain dump cards, completed tasks, uploaded files, session notes
+- [ ] Agent persistently knows: design preferences, approved directions, key decisions, client tone
+
+---
+
+### 3B — Automated Runs
+
+- [ ] **Daily 7am** — morning digest: agent reads tasks + calendar events → populates DigestStrip on Level 1
+- [ ] **Mon 7am** — weekly priorities email: agent reads all client data → drafts + sends email to studio owner
+- [ ] **Task → Done trigger** — agent flags completion; proactively suggests next action based on client memory
+- [ ] **Deadline in 3 days** — agent flags task card; writes calendar reminder via Google Calendar MCP
+
+---
+
+### 3C — Google Calendar MCP
+
+- [ ] Connect Google Calendar via MCP on Anthropic infra (read + write access)
+- [ ] Due dates push to calendar automatically when set or changed
+- [ ] Calendar events appear in Level 1 WeekCalendar (replacing static placeholder)
+- [ ] Linked calendar card in TaskDetail right sidebar — shows live event for this task if one exists
+
+---
+
+### 3D — AI Brief + Smart Tools
+
+- [ ] Edge Function: `/generate-brief` — brain dump cards → structured shareable client brief
+- [ ] Edge Function: `/auto-tag` — brain dump entries → theme tags (brand, copy, visual, strategy)
+- [ ] Brief preview modal in ClientBoard brain dump tab
+- [ ] AI tag chips on brain dump cards
+- [ ] "Extract action items" in TaskDetail notes — Claude reads notes → returns calendar items
+
+---
+
+### 3E — Claude Panel (Task Detail)
+
+- [ ] Wire Claude panel in TaskDetail — context from brain dump + notes + client memory
+- [ ] Proactive message ("I know this client from N sessions")
+- [ ] Action buttons: e.g. "Draft 3 directions ↗", "Draft review email ↗"
+- [ ] Actions call Claude Managed Agent with current task context
+
+---
+
+### 3F — Buffer Integration
+
+- [ ] Connect Buffer API per studio owner account
+- [ ] Queued posts visible per client (on ClientBoard or sidebar)
+- [ ] "Draft post" action in Claude panel → Buffer queue
+
+---
+
+### 3G — Figma Link Field
+
+- [ ] Add `figma_url text` column to `tasks` table (migration)
+- [ ] Figma link field in TaskDetail sidebar — paste URL; shows "Open in Figma ↗"
+- [ ] No file storage — URL-only, opens natively in Figma
+
+---
+
+### 3H — Digest + Notifications
+
+- [ ] Notification preferences wired — connect Settings digest time to automated run schedule
+- [ ] Email delivery for weekly digest (Supabase edge function or Resend)
 
 ---
 
@@ -159,7 +221,6 @@ Items are ordered by build priority. Do not skip ahead — each group unblocks t
 - [ ] Time tracking — log hours per task; roll up per client per week
 - [ ] Invoice generator — PDF from logged hours + client rate; downloadable
 - [ ] Proposal template builder — turn client brief into a project scope doc
-- [ ] Google Calendar sync — sync task due dates as calendar events; surface in WeekCalendar
 - [ ] Subcontractor support — re-enable task_assignments RLS policies; invite flow; limited portal access
 
 ---
