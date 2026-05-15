@@ -35,28 +35,27 @@ export default function WeekCalendar() {
         <span className="text-dark-subtle text-xs">{rangeLabel}</span>
       </div>
 
-      <div className="overflow-x-auto -mx-6 px-6 sm:mx-0 sm:px-0">
-      <div className="grid grid-cols-5 gap-3" style={{ minWidth: '420px' }}>
+      <div className="grid grid-cols-5 gap-2 sm:gap-3">
         {days.map((day, i) => {
           const isToday = isSameDay(day, today)
           return (
             <div
               key={i}
-              className={`card p-4 flex flex-col gap-3 ${isToday ? 'border-brand-green' : ''}`}
+              className={`card p-2 sm:p-4 flex flex-col gap-1 sm:gap-3 ${isToday ? 'border-brand-green' : ''}`}
             >
               <div>
                 <p className={`text-xs font-medium ${isToday ? 'text-brand-green' : 'text-dark-muted'}`}>
                   {DAY_LABELS[i]}
                 </p>
-                <p className="text-dark-text text-2xl font-medium mt-0.5 tabular-nums">
+                <p className="text-dark-text text-lg sm:text-2xl font-medium mt-0.5 tabular-nums">
                   {day.getDate()}
                 </p>
               </div>
-              <p className="text-dark-subtle text-xs">No events</p>
+              <p className="text-dark-subtle text-xs hidden sm:block">No events</p>
+              <div className="sm:hidden w-1.5 h-1.5 rounded-full bg-dark-subtle/30" />
             </div>
           )
         })}
-      </div>
       </div>
     </section>
   )
