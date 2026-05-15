@@ -71,21 +71,40 @@ export default function ClientHeader({ client, stats, onHealthChange }) {
               <img
                 src={client.logo_url}
                 alt=""
-                className="w-10 h-10 rounded-lg object-cover shrink-0 border border-dark-border"
+                className="w-12 h-12 rounded-xl object-cover shrink-0 border border-dark-border"
+                style={{ viewTransitionName: `client-avatar-${client.id}` }}
               />
             ) : (
               <div
-                className="w-10 h-10 rounded-lg flex items-center justify-center text-base font-semibold shrink-0 select-none"
-                style={{ backgroundColor: accentColor + '28', color: accentColor }}
+                className="w-12 h-12 rounded-xl flex items-center justify-center text-base font-semibold shrink-0 select-none"
+                style={{
+                  backgroundColor: accentColor + '28',
+                  color: accentColor,
+                  viewTransitionName: `client-avatar-${client.id}`,
+                }}
               >
                 {client.name?.[0]?.toUpperCase()}
               </div>
             )}
 
             <div className="min-w-0">
-              <h1 className="text-dark-text font-medium text-xl leading-tight truncate">
-                {client.name}{client.project_name && ` — ${client.project_name}`}
+              <h1
+                className="leading-none truncate"
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  fontSize: 'clamp(24px, 3.5vw, 36px)',
+                  fontWeight: 400,
+                  letterSpacing: '-0.02em',
+                  color: 'var(--color-text)',
+                }}
+              >
+                {client.name}
               </h1>
+              {client.project_name && (
+                <p className="text-sm mt-1 truncate" style={{ color: 'var(--color-muted)' }}>
+                  {client.project_name}
+                </p>
+              )}
               <div className="flex items-center gap-2 mt-1.5 flex-wrap">
 
                 {/* Health badge — clickable dropdown */}

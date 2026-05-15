@@ -29,7 +29,18 @@ export default function TaskGroup({ group, onCreateTask, onUpdateTask, onDeleteT
   const [nameValue, setNameValue]         = useState('')
   const [colorOpen, setColorOpen]         = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState(false)
-  const colorRef = useRef(null)
+  const [isActive, setIsActive]           = useState(false)
+  const colorRef  = useRef(null)
+  const headerRef = useRef(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsActive(entry.isIntersecting),
+      { rootMargin: '-8% 0px -80% 0px' }
+    )
+    if (headerRef.current) observer.observe(headerRef.current)
+    return () => observer.disconnect()
+  }, [])
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -64,13 +75,17 @@ export default function TaskGroup({ group, onCreateTask, onUpdateTask, onDeleteT
   return (
     <div className="mb-2">
       {/* Group header */}
-      <div className="group flex items-center gap-2.5 py-3">
+      <div ref={headerRef} className="task-group-header group flex items-center gap-2.5 py-3">
 
-        {/* Color dot — click for color picker */}
+        {/* Color dot — click for color picker; glows when group is active in viewport */}
         <div ref={colorRef} className="relative shrink-0">
           <button
-            className="tooltip w-2.5 h-2.5 rounded-full hover:scale-125 transition-transform focus:outline-none"
-            style={{ backgroundColor: group.color }}
+            className="tooltip w-2.5 h-2.5 rounded-full hover:scale-125 transition-all duration-300 focus:outline-none"
+            style={{
+              backgroundColor: group.color,
+              transform: isActive ? 'scale(1.25)' : 'scale(1)',
+              boxShadow: isActive ? `0 0 0 3px ${group.color}40` : 'none',
+            }}
             data-tip="Change color"
             onClick={() => setColorOpen(v => !v)}
             aria-label="Change group color"

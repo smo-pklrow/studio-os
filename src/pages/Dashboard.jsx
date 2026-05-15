@@ -90,6 +90,19 @@ export default function Dashboard() {
     })
   }, [])
 
+  useEffect(() => {
+    function handle(e) {
+      const active = document.activeElement
+      const editing = active?.tagName === 'INPUT' || active?.tagName === 'TEXTAREA' || active?.isContentEditable
+      if (!editing && e.key === 'n' && !e.metaKey && !e.ctrlKey) {
+        e.preventDefault()
+        setShowAddModal(true)
+      }
+    }
+    document.addEventListener('keydown', handle)
+    return () => document.removeEventListener('keydown', handle)
+  }, [])
+
   function dismissNudge() {
     localStorage.setItem('portal-nudge-dismissed', 'true')
     setNudgeDismissed(true)
@@ -120,8 +133,14 @@ export default function Dashboard() {
         <div className="max-w-5xl mx-auto w-full px-6 py-6 flex items-end justify-between gap-4">
           <div className="animate-fade-up">
             <h1
-              className="font-medium leading-tight mb-1"
-              style={{ fontSize: 'clamp(22px, 3vw, 30px)', color: 'var(--color-text)', letterSpacing: '-0.01em' }}
+              className="leading-tight mb-1"
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: 'clamp(26px, 3.5vw, 36px)',
+                fontWeight: 400,
+                letterSpacing: '-0.01em',
+                color: 'var(--color-text)',
+              }}
             >
               {firstName ? getGreeting(firstName) : formatHeaderDate()}
             </h1>

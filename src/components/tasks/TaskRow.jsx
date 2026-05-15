@@ -38,12 +38,24 @@ function getDueState(task) {
 export default function TaskRow({ task, onUpdate, onDelete }) {
   const { clientId } = useParams()
   const navigate = useNavigate()
-  const [statusOpen, setStatusOpen]   = useState(false)
-  const [dateEditing, setDateEditing] = useState(false)
-  const [titleEditing, setTitleEditing] = useState(false)
-  const [titleValue, setTitleValue]   = useState('')
+  const [statusOpen, setStatusOpen]       = useState(false)
+  const [dateEditing, setDateEditing]     = useState(false)
+  const [titleEditing, setTitleEditing]   = useState(false)
+  const [titleValue, setTitleValue]       = useState('')
+  const [checkPop, setCheckPop]           = useState(false)
   const statusRef  = useRef(null)
   const navTimer   = useRef(null)
+  const prevDone   = useRef(task.status === 'done')
+
+  useEffect(() => {
+    const nowDone = task.status === 'done'
+    if (nowDone && !prevDone.current) {
+      setCheckPop(true)
+      const t = setTimeout(() => setCheckPop(false), 280)
+      return () => clearTimeout(t)
+    }
+    prevDone.current = nowDone
+  }, [task.status])
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: task.id })
 
@@ -121,6 +133,7 @@ export default function TaskRow({ task, onUpdate, onDelete }) {
           style={{
             backgroundColor: isDone ? 'var(--color-brand)' : 'transparent',
             border: isDone ? 'none' : '1.5px solid var(--border-strong)',
+            animation: checkPop ? 'checkbox-pop 280ms var(--ease-out)' : 'none',
           }}
           onClick={() => onUpdate({ status: isDone ? 'todo' : 'done' })}
         >
@@ -147,7 +160,7 @@ export default function TaskRow({ task, onUpdate, onDelete }) {
           />
         ) : (
           <span
-            className={`tooltip text-sm truncate select-none ${isDone ? 'text-dark-subtle line-through' : 'text-dark-text hover:underline cursor-pointer'}`}
+            className={`tooltip text-sm truncate select-none ${isDone ? 'task-title-done' : 'text-dark-text hover:underline cursor-pointer'}`}
             data-tip="Click to open · Double-click to rename"
             onClick={handleTitleClick}
             onDoubleClick={handleTitleDoubleClick}

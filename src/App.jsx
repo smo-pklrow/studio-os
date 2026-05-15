@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Lenis from 'lenis'
 import AppShell from './components/layout/AppShell.jsx'
@@ -11,8 +11,11 @@ import Settings from './pages/Settings.jsx'
 import NotFound from './pages/NotFound.jsx'
 import ErrorBoundary from './components/shared/ErrorBoundary.jsx'
 import { ToastProvider } from './components/shared/Toast.jsx'
+import CommandPalette from './components/shared/CommandPalette.jsx'
 
 export default function App() {
+  const [paletteOpen, setPaletteOpen] = useState(false)
+
   useEffect(() => {
     const lenis = new Lenis({ duration: 1.1, easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)) })
     let frame
@@ -24,8 +27,20 @@ export default function App() {
     return () => { cancelAnimationFrame(frame); lenis.destroy() }
   }, [])
 
+  useEffect(() => {
+    function handle(e) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        setPaletteOpen(v => !v)
+      }
+    }
+    document.addEventListener('keydown', handle)
+    return () => document.removeEventListener('keydown', handle)
+  }, [])
+
   return (
     <ToastProvider>
+    {paletteOpen && <CommandPalette onClose={() => setPaletteOpen(false)} />}
     <Routes>
       {/* Public routes — no auth required */}
       <Route path="/portal/:shareToken" element={<ClientPortal />} />

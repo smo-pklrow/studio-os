@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { flushSync } from 'react-dom'
 
 const HEALTH = {
   on_track:        { badge: 'badge-green', label: 'On track',        color: '#1D9E75' },
@@ -24,8 +25,9 @@ function relativeTime(dateStr) {
 
 export default function ClientRow({ client, onArchive, onEdit, onPause, onHealthChange, className = '' }) {
   const navigate = useNavigate()
-  const [menuOpen, setMenuOpen]     = useState(false)
-  const [healthOpen, setHealthOpen] = useState(false)
+  const [menuOpen, setMenuOpen]         = useState(false)
+  const [healthOpen, setHealthOpen]     = useState(false)
+  const [animatedPct, setAnimatedPct]   = useState(0)
   const menuRef   = useRef(null)
   const healthRef = useRef(null)
 
@@ -34,6 +36,11 @@ export default function ClientRow({ client, onArchive, onEdit, onPause, onHealth
   const stats       = client._stats ?? {}
   const percent     = stats.total > 0 ? Math.round((stats.done / stats.total) * 100) : 0
   const isPaused    = client.status === 'paused'
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setAnimatedPct(percent))
+    return () => cancelAnimationFrame(frame)
+  }, [percent])
 
   const metaParts = [
     client.project_name,
@@ -66,7 +73,10 @@ export default function ClientRow({ client, onArchive, onEdit, onPause, onHealth
         ? { borderColor: 'rgba(244,166,35,0.35)', opacity: 0.75 }
         : { borderLeftColor: accentColor, borderLeftWidth: '3px' }
       }
-      onClick={() => navigate(`/client/${client.id}`)}
+      onClick={() => {
+        if (!document.startViewTransition) { navigate(`/client/${client.id}`); return }
+        document.startViewTransition(() => flushSync(() => navigate(`/client/${client.id}`)))
+      }}
     >
       {/* Avatar */}
       {client.logo_url ? (
@@ -74,11 +84,12 @@ export default function ClientRow({ client, onArchive, onEdit, onPause, onHealth
           src={client.logo_url}
           alt=""
           className="w-10 h-10 rounded-lg object-cover shrink-0 border border-dark-border"
+          style={{ viewTransitionName: `client-avatar-${client.id}` }}
         />
       ) : (
         <div
           className="w-10 h-10 rounded-lg flex items-center justify-center text-sm font-semibold shrink-0 select-none"
-          style={{ backgroundColor: accentColor + '28', color: accentColor }}
+          style={{ backgroundColor: accentColor + '28', color: accentColor, viewTransitionName: `client-avatar-${client.id}` }}
         >
           {client.name?.[0]?.toUpperCase()}
         </div>
@@ -96,7 +107,7 @@ export default function ClientRow({ client, onArchive, onEdit, onPause, onHealth
         <div className="progress-bar mb-2">
           <div
             className="progress-fill"
-            style={{ width: `${percent}%`, background: isPaused ? '#F4A623' : health.color }}
+            style={{ width: `${animatedPct}%`, background: isPaused ? '#F4A623' : health.color }}
           />
         </div>
 

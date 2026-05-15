@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { useClient } from '../hooks/useClient'
 import { useTasks } from '../hooks/useTasks'
@@ -45,10 +45,35 @@ export default function ClientBoard() {
   const [tab, setTab] = useState(() => getTab(clientId))
   const [addingGroup, setAddingGroup] = useState(false)
   const [newGroupName, setNewGroupName] = useState('')
+  const addGroupInputRef = useRef(null)
 
   const { client, updateClient } = useClient(clientId)
   const { groups, loading, createGroup, createTask, updateTask, deleteTask, reorderTasks, updateGroup, deleteGroup } = useTasks(clientId)
   const { cards, createCard, updateCard, deleteCard } = useBrainDump(clientId)
+
+  // Dynamic browser theme-color matches client brand color
+  useEffect(() => {
+    if (!client?.color) return
+    let meta = document.querySelector('meta[name="theme-color"]')
+    if (!meta) { meta = document.createElement('meta'); meta.name = 'theme-color'; document.head.appendChild(meta) }
+    meta.content = client.color
+    return () => { meta.content = '#1E1E1C' }
+  }, [client?.color])
+
+  // N shortcut — open new group form when on tasks tab
+  useEffect(() => {
+    function handle(e) {
+      const active  = document.activeElement
+      const editing = active?.tagName === 'INPUT' || active?.tagName === 'TEXTAREA' || active?.isContentEditable
+      if (!editing && e.key === 'n' && !e.metaKey && !e.ctrlKey && tab === 'tasks') {
+        e.preventDefault()
+        setAddingGroup(true)
+        setTimeout(() => addGroupInputRef.current?.focus(), 50)
+      }
+    }
+    document.addEventListener('keydown', handle)
+    return () => document.removeEventListener('keydown', handle)
+  }, [tab])
 
   const allTasks = groups.flatMap(g => g.tasks)
   const today = new Date().toISOString().split('T')[0]
@@ -135,6 +160,7 @@ export default function ClientBoard() {
               {addingGroup ? (
                 <form onSubmit={handleAddGroup} className="flex items-center gap-2">
                   <input
+                    ref={addGroupInputRef}
                     autoFocus
                     className="bg-dark-elevated border border-dark-border rounded-lg px-3 py-2 text-sm text-dark-text placeholder:text-dark-subtle focus:outline-none focus:border-brand-green transition-colors"
                     placeholder="Group name…"
