@@ -3,7 +3,7 @@
 > Update this file after every session. Mark tasks `[x]` when complete. Add blockers inline.
 
 **Current phase**: Phase 2 — Core UX Completion
-**Last updated**: 2026-05-14
+**Last updated**: 2026-05-15
 
 ---
 
@@ -21,13 +21,19 @@
 ## Phase 2 — Core UX Completion `[IN PROGRESS]`
 
 ### Dashboard (Level 1)
-- [x] ClientCard component with status badge, last-activity timestamp
-- [x] Empty state (no clients yet)
-- [x] Add client modal (name, project name)
+- [x] Add client modal (name, project name, color picker, logo upload)
 - [x] Archive client flow
 - [x] Client color — per-client brand color picker (stored in `clients.color`)
-- [x] Client logo — upload via Supabase Storage `client-logos` bucket (stored in `clients.logo_url`); show in ClientCard + Client Board header
+- [x] Client logo — upload via Supabase Storage `client-logos` bucket (stored in `clients.logo_url`)
 - [x] Schema migration — `supabase/migrations/002_client_branding.sql` (run in SQL Editor)
+- [x] Header — date, active client count, New client button
+- [x] Week calendar strip — Mon–Fri, today highlighted, event slots (no data yet)
+- [x] Morning digest panel — UI shell (wired up in Phase 3 with Claude Edge Function)
+- [x] Stats bar — Active clients · Open tasks · Overdue · Done this week (live from DB)
+- [x] Client list rows — logo/avatar, progress bar (health-colored), task status counts (done / in progress / to do / overdue / blocked), health badge, last-updated timestamp
+- [x] `useClients` enriched — embeds task_groups + tasks per client, computes per-client and global stats
+- [ ] Week calendar events — requires Google Calendar sync (Phase 4) or custom event model
+- [ ] Empty state polish — illustration / onboarding copy
 
 ### Client Board (Level 2)
 - [ ] Tasks tab — full CRUD with drag-drop reorder

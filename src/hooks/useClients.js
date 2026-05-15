@@ -1,6 +1,39 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 
+const TASK_SELECT = `
+  *,
+  task_groups(
+    id,
+    tasks(id, status, due_date, updated_at)
+  )
+`
+
+function computeStats(taskGroups) {
+  const today = new Date().toISOString().split('T')[0]
+  const startOfWeek = new Date()
+  startOfWeek.setDate(startOfWeek.getDate() - ((startOfWeek.getDay() + 6) % 7)) // Monday
+  startOfWeek.setHours(0, 0, 0, 0)
+
+  const tasks = (taskGroups ?? []).flatMap(g => g.tasks ?? [])
+  const done       = tasks.filter(t => t.status === 'done').length
+  const inProgress = tasks.filter(t => t.status === 'in_progress').length
+  const todo       = tasks.filter(t => t.status === 'todo').length
+  const blocked    = tasks.filter(t => t.status === 'blocked').length
+  const overdue    = tasks.filter(t => t.due_date && t.due_date < today && t.status !== 'done').length
+  const doneThisWeek = tasks.filter(t => t.status === 'done' && new Date(t.updated_at) >= startOfWeek).length
+
+  return {
+    total: tasks.length,
+    groupCount: (taskGroups ?? []).length,
+    done, inProgress, todo, blocked, overdue, doneThisWeek,
+  }
+}
+
+function enrich(client) {
+  return { ...client, _stats: computeStats(client.task_groups) }
+}
+
 export function useClients() {
   const [clients, setClients] = useState([])
   const [loading, setLoading] = useState(true)
@@ -9,15 +42,22 @@ export function useClients() {
   useEffect(() => {
     supabase
       .from('clients')
-      .select('*')
+      .select(TASK_SELECT)
       .neq('status', 'archived')
       .order('updated_at', { ascending: false })
       .then(({ data, error }) => {
         if (error) setError(error)
-        else setClients(data ?? [])
+        else setClients((data ?? []).map(enrich))
         setLoading(false)
       })
   }, [])
+
+  const globalStats = {
+    activeClients: clients.length,
+    openTasks:     clients.reduce((s, c) => s + c._stats.inProgress + c._stats.todo, 0),
+    overdue:       clients.reduce((s, c) => s + c._stats.overdue, 0),
+    doneThisWeek:  clients.reduce((s, c) => s + c._stats.doneThisWeek, 0),
+  }
 
   async function createClient(fields, logoFile) {
     const { data: { user } } = await supabase.auth.getUser()
@@ -25,14 +65,11 @@ export function useClients() {
     let logo_url = null
     if (logoFile) {
       const ext = logoFile.name.split('.').pop()
-      const path = `${user.id}/${Date.now()}.${ext}`
       const { data: upload, error: uploadError } = await supabase.storage
         .from('client-logos')
-        .upload(path, logoFile, { contentType: logoFile.type })
+        .upload(`${user.id}/${Date.now()}.${ext}`, logoFile, { contentType: logoFile.type })
       if (!uploadError) {
-        const { data: { publicUrl } } = supabase.storage
-          .from('client-logos')
-          .getPublicUrl(upload.path)
+        const { data: { publicUrl } } = supabase.storage.from('client-logos').getPublicUrl(upload.path)
         logo_url = publicUrl
       }
     }
@@ -40,17 +77,14 @@ export function useClients() {
     const { data, error } = await supabase
       .from('clients')
       .insert({ ...fields, logo_url, owner_id: user.id })
-      .select()
+      .select(TASK_SELECT)
       .single()
-    if (!error) setClients(prev => [data, ...prev])
+    if (!error) setClients(prev => [enrich(data), ...prev])
     return { data, error }
   }
 
   async function archiveClient(id) {
-    const { error } = await supabase
-      .from('clients')
-      .update({ status: 'archived' })
-      .eq('id', id)
+    const { error } = await supabase.from('clients').update({ status: 'archived' }).eq('id', id)
     if (!error) setClients(prev => prev.filter(c => c.id !== id))
     return { error }
   }
@@ -60,11 +94,11 @@ export function useClients() {
       .from('clients')
       .update(fields)
       .eq('id', id)
-      .select()
+      .select(TASK_SELECT)
       .single()
-    if (!error) setClients(prev => prev.map(c => c.id === id ? data : c))
+    if (!error) setClients(prev => prev.map(c => c.id === id ? enrich(data) : c))
     return { data, error }
   }
 
-  return { clients, loading, error, createClient, archiveClient, updateClient }
+  return { clients, loading, error, globalStats, createClient, archiveClient, updateClient }
 }
