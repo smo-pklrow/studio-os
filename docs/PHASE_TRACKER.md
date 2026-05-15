@@ -2,7 +2,7 @@
 
 > Update this file after every session. Mark tasks `[x]` when complete. Add blockers inline.
 
-**Current phase**: Phase 2 — Core UX Completion
+**Current phase**: Phase 2 — Core UX Completion (2B done → 2C next)
 **Last updated**: 2026-05-15
 
 ---
@@ -34,21 +34,21 @@ Items are ordered by build priority. Do not skip ahead — each group unblocks t
 
 ---
 
-### 2B — Client Edit & Dashboard Gaps `[NEXT]`
+### 2B — Client Edit & Dashboard Gaps `[COMPLETE]`
 
 > The single biggest day-two UX gap. Right now clients are write-once.
 
-- [ ] Edit client modal — pre-fills name, project name, color, logo, health, start date, due date; saves via `updateClient`
-- [ ] "Edit" option in ClientRow three-dot menu (opens edit modal)
-- [ ] Health selector — click health badge on ClientRow to cycle / dropdown-change status
-- [ ] Pause client flow — `status: paused` shows differently in the list (amber tint, not archived)
-- [ ] Start date + due date fields in AddClientModal (were in schema, missing from creation form)
-- [ ] Search / filter bar on Dashboard — filter rows by client name or health status
-- [ ] Empty state polish — better copy and visual for zero-client state
+- [x] Edit client modal — pre-fills name, project name, color, logo, health, start date, due date; saves via `updateClient`
+- [x] "Edit" option in ClientRow three-dot menu (opens edit modal)
+- [x] Health selector — click health badge on ClientRow to cycle / dropdown-change status
+- [x] Pause client flow — `status: paused` shows differently in the list (amber tint, not archived)
+- [x] Start date + due date fields in AddClientModal (were in schema, missing from creation form)
+- [x] Search / filter bar on Dashboard — filter rows by client name or health status
+- [x] Empty state polish — better copy and visual for zero-client state
 
 ---
 
-### 2C — Level 2 Task Board Gaps `[NEXT]`
+### 2C — Level 2 Task Board Gaps `[NEXT — current]`
 
 > Core daily-use gaps. The board is incomplete without these.
 

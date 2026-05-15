@@ -13,47 +13,49 @@ const HEALTH_OPTIONS = [
   { value: 'nearly_done',     label: 'Nearly done',     badge: 'badge-blue'  },
 ]
 
-export default function AddClientModal({ onClose, onAdd }) {
-  const [name, setName] = useState('')
-  const [projectName, setProjectName] = useState('')
-  const [color, setColor] = useState(COLOR_SWATCHES[0])
-  const [health, setHealth] = useState('on_track')
-  const [startDate, setStartDate] = useState('')
-  const [dueDate, setDueDate] = useState('')
-  const [logoFile, setLogoFile] = useState(null)
-  const [logoPreview, setLogoPreview] = useState(null)
-  const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState(null)
+export default function EditClientModal({ client, onClose, onSave }) {
+  const [name, setName]               = useState(client.name ?? '')
+  const [projectName, setProjectName] = useState(client.project_name ?? '')
+  const [color, setColor]             = useState(client.color ?? COLOR_SWATCHES[0])
+  const [health, setHealth]           = useState(client.health ?? 'on_track')
+  const [startDate, setStartDate]     = useState(client.start_date ?? '')
+  const [dueDate, setDueDate]         = useState(client.due_date ?? '')
+  const [logoPreview, setLogoPreview] = useState(client.logo_url ?? null)
+  const [newLogoFile, setNewLogoFile] = useState(null)
+  const [removeLogo, setRemoveLogo]   = useState(false)
+  const [submitting, setSubmitting]   = useState(false)
+  const [error, setError]             = useState(null)
   const fileInputRef = useRef(null)
 
   function handleLogoChange(e) {
     const file = e.target.files[0]
     if (!file) return
-    setLogoFile(file)
+    setNewLogoFile(file)
     setLogoPreview(URL.createObjectURL(file))
+    setRemoveLogo(false)
   }
 
   function handleRemoveLogo() {
-    setLogoFile(null)
+    setNewLogoFile(null)
     setLogoPreview(null)
-    fileInputRef.current.value = ''
+    setRemoveLogo(true)
+    if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
   async function handleSubmit(e) {
     e.preventDefault()
     if (!name.trim()) return
     setSubmitting(true)
-    const { error } = await onAdd(
-      {
-        name: name.trim(),
-        project_name: projectName.trim() || null,
-        color,
-        health,
-        start_date: startDate || null,
-        due_date: dueDate || null,
-      },
-      logoFile
-    )
+    const fields = {
+      name: name.trim(),
+      project_name: projectName.trim() || null,
+      color,
+      health,
+      start_date: startDate || null,
+      due_date: dueDate || null,
+    }
+    if (removeLogo && !newLogoFile) fields.logo_url = null
+    const { error } = await onSave(client.id, fields, newLogoFile)
     setSubmitting(false)
     if (error) setError(error.message)
     else onClose()
@@ -66,10 +68,10 @@ export default function AddClientModal({ onClose, onAdd }) {
       onClick={onClose}
     >
       <div
-        className="card card-elevated w-full max-w-md mx-4 p-6 animate-fade-up"
+        className="card card-elevated w-full max-w-md mx-4 p-6 animate-fade-up max-h-[90dvh] overflow-y-auto"
         onClick={e => e.stopPropagation()}
       >
-        <h2 className="text-dark-text font-medium text-base mb-5">New client</h2>
+        <h2 className="text-dark-text font-medium text-base mb-5">Edit client</h2>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
@@ -126,7 +128,7 @@ export default function AddClientModal({ onClose, onAdd }) {
                 <button
                   key={opt.value}
                   type="button"
-                  className={`badge ${opt.badge} cursor-pointer transition-opacity ${health === opt.value ? 'opacity-100' : 'opacity-40 hover:opacity-70'}`}
+                  className={`badge ${opt.badge} cursor-pointer transition-opacity ${health === opt.value ? 'opacity-100 ring-2 ring-offset-1 ring-offset-transparent' : 'opacity-50 hover:opacity-80'}`}
                   style={health === opt.value ? { outline: '2px solid currentColor', outlineOffset: '2px' } : {}}
                   onClick={() => setHealth(opt.value)}
                 >
@@ -156,7 +158,7 @@ export default function AddClientModal({ onClose, onAdd }) {
             </div>
           </div>
 
-          {/* Logo upload */}
+          {/* Logo */}
           <div>
             <label className="block text-dark-muted text-xs mb-2">Logo</label>
             {logoPreview ? (
@@ -166,11 +168,10 @@ export default function AddClientModal({ onClose, onAdd }) {
                   alt="Logo preview"
                   className="w-12 h-12 rounded-lg object-cover border border-dark-border"
                 />
-                <button
-                  type="button"
-                  className="btn text-xs"
-                  onClick={handleRemoveLogo}
-                >
+                <button type="button" className="btn text-xs" onClick={() => fileInputRef.current.click()}>
+                  Replace
+                </button>
+                <button type="button" className="btn text-xs text-red-400" onClick={handleRemoveLogo}>
                   Remove
                 </button>
               </div>
@@ -192,20 +193,16 @@ export default function AddClientModal({ onClose, onAdd }) {
             />
           </div>
 
-          {error && (
-            <p className="text-red-400 text-xs">{error}</p>
-          )}
+          {error && <p className="text-red-400 text-xs">{error}</p>}
 
           <div className="flex gap-2 justify-end pt-1">
-            <button type="button" className="btn" onClick={onClose}>
-              Cancel
-            </button>
+            <button type="button" className="btn" onClick={onClose}>Cancel</button>
             <button
               type="submit"
               className="btn btn-primary"
               disabled={!name.trim() || submitting}
             >
-              {submitting ? 'Adding…' : 'Add client'}
+              {submitting ? 'Saving…' : 'Save changes'}
             </button>
           </div>
         </form>

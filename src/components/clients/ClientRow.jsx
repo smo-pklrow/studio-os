@@ -8,6 +8,8 @@ const HEALTH = {
   nearly_done:     { badge: 'badge-blue',  label: 'Nearly done',      color: '#378ADD' },
 }
 
+const HEALTH_ORDER = ['on_track', 'needs_attention', 'blocked', 'nearly_done']
+
 function relativeTime(dateStr) {
   const diff = Date.now() - new Date(dateStr).getTime()
   const mins = Math.floor(diff / 60000)
@@ -20,15 +22,18 @@ function relativeTime(dateStr) {
   return `${Math.floor(days / 30)}mo ago`
 }
 
-export default function ClientRow({ client, onArchive, className = '' }) {
+export default function ClientRow({ client, onArchive, onEdit, onPause, onHealthChange, className = '' }) {
   const navigate = useNavigate()
-  const [menuOpen, setMenuOpen] = useState(false)
-  const menuRef = useRef(null)
+  const [menuOpen, setMenuOpen]     = useState(false)
+  const [healthOpen, setHealthOpen] = useState(false)
+  const menuRef   = useRef(null)
+  const healthRef = useRef(null)
 
-  const health = HEALTH[client.health] ?? HEALTH.on_track
+  const health      = HEALTH[client.health] ?? HEALTH.on_track
   const accentColor = client.color || health.color
-  const stats = client._stats ?? {}
-  const percent = stats.total > 0 ? Math.round((stats.done / stats.total) * 100) : 0
+  const stats       = client._stats ?? {}
+  const percent     = stats.total > 0 ? Math.round((stats.done / stats.total) * 100) : 0
+  const isPaused    = client.status === 'paused'
 
   const metaParts = [
     client.project_name,
@@ -45,9 +50,19 @@ export default function ClientRow({ client, onArchive, className = '' }) {
     return () => document.removeEventListener('mousedown', handle)
   }, [menuOpen])
 
+  useEffect(() => {
+    if (!healthOpen) return
+    function handle(e) {
+      if (healthRef.current && !healthRef.current.contains(e.target)) setHealthOpen(false)
+    }
+    document.addEventListener('mousedown', handle)
+    return () => document.removeEventListener('mousedown', handle)
+  }, [healthOpen])
+
   return (
     <div
       className={`card card-interactive group relative flex items-center gap-4 p-5 ${className}`}
+      style={isPaused ? { borderColor: 'rgba(244,166,35,0.35)', opacity: 0.75 } : {}}
       onClick={() => navigate(`/client/${client.id}`)}
     >
       {/* Avatar */}
@@ -78,7 +93,7 @@ export default function ClientRow({ client, onArchive, className = '' }) {
         <div className="progress-bar mb-2">
           <div
             className="progress-fill"
-            style={{ width: `${percent}%`, background: health.color }}
+            style={{ width: `${percent}%`, background: isPaused ? '#F4A623' : health.color }}
           />
         </div>
 
@@ -105,9 +120,41 @@ export default function ClientRow({ client, onArchive, className = '' }) {
         </div>
       </div>
 
-      {/* Right — health + timestamp */}
+      {/* Right — health badge + status + timestamp */}
       <div className="shrink-0 flex flex-col items-end gap-2 ml-2">
-        <span className={`badge ${health.badge}`}>{health.label}</span>
+        {/* Health badge — clickable */}
+        <div className="relative" ref={healthRef}>
+          <button
+            className={`badge ${health.badge} cursor-pointer hover:opacity-80 transition-opacity`}
+            onClick={e => { e.stopPropagation(); setHealthOpen(v => !v) }}
+          >
+            {health.label}
+          </button>
+
+          {healthOpen && (
+            <div className="absolute right-0 top-7 card card-elevated z-10 min-w-[160px] py-1">
+              {HEALTH_ORDER.map(key => {
+                const h = HEALTH[key]
+                return (
+                  <button
+                    key={key}
+                    className="w-full text-left px-3 py-2 text-xs hover:bg-dark-elevated transition-colors flex items-center gap-2"
+                    onClick={e => {
+                      e.stopPropagation()
+                      setHealthOpen(false)
+                      if (key !== client.health) onHealthChange?.(client.id, key)
+                    }}
+                  >
+                    <span className={`badge ${h.badge}`}>{h.label}</span>
+                    {key === client.health && <span className="text-dark-subtle ml-auto">✓</span>}
+                  </button>
+                )
+              })}
+            </div>
+          )}
+        </div>
+
+        {isPaused && <span className="badge badge-amber">Paused</span>}
         <span className="text-dark-subtle text-xs">{relativeTime(client.updated_at)}</span>
       </div>
 
@@ -126,6 +173,19 @@ export default function ClientRow({ client, onArchive, className = '' }) {
           className="absolute right-3 top-14 card card-elevated z-10 min-w-[148px] py-1"
           onClick={e => e.stopPropagation()}
         >
+          <button
+            className="w-full text-left px-3 py-2 text-xs text-dark-text hover:bg-dark-elevated transition-colors"
+            onClick={() => { setMenuOpen(false); onEdit?.(client) }}
+          >
+            Edit client
+          </button>
+          <button
+            className="w-full text-left px-3 py-2 text-xs text-dark-muted hover:bg-dark-elevated transition-colors"
+            onClick={() => { setMenuOpen(false); onPause?.(client.id) }}
+          >
+            {isPaused ? 'Unpause client' : 'Pause client'}
+          </button>
+          <div className="border-t my-1" style={{ borderColor: 'var(--border-subtle)' }} />
           <button
             className="w-full text-left px-3 py-2 text-xs text-red-400 hover:bg-dark-elevated transition-colors"
             onClick={() => { setMenuOpen(false); onArchive(client.id) }}

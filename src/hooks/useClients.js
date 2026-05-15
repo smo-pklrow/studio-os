@@ -89,10 +89,22 @@ export function useClients() {
     return { error }
   }
 
-  async function updateClient(id, fields) {
+  async function updateClient(id, fields, logoFile) {
+    let updatedFields = { ...fields }
+    if (logoFile) {
+      const { data: { user } } = await supabase.auth.getUser()
+      const ext = logoFile.name.split('.').pop()
+      const { data: upload, error: uploadError } = await supabase.storage
+        .from('client-logos')
+        .upload(`${user.id}/${Date.now()}.${ext}`, logoFile, { contentType: logoFile.type })
+      if (!uploadError) {
+        const { data: { publicUrl } } = supabase.storage.from('client-logos').getPublicUrl(upload.path)
+        updatedFields.logo_url = publicUrl
+      }
+    }
     const { data, error } = await supabase
       .from('clients')
-      .update(fields)
+      .update(updatedFields)
       .eq('id', id)
       .select(TASK_SELECT)
       .single()
@@ -100,5 +112,19 @@ export function useClients() {
     return { data, error }
   }
 
-  return { clients, loading, error, globalStats, createClient, archiveClient, updateClient }
+  async function pauseClient(id) {
+    const client = clients.find(c => c.id === id)
+    if (!client) return { error: new Error('Client not found') }
+    const newStatus = client.status === 'paused' ? 'active' : 'paused'
+    const { data, error } = await supabase
+      .from('clients')
+      .update({ status: newStatus })
+      .eq('id', id)
+      .select(TASK_SELECT)
+      .single()
+    if (!error) setClients(prev => prev.map(c => c.id === id ? enrich(data) : c))
+    return { data, error }
+  }
+
+  return { clients, loading, error, globalStats, createClient, archiveClient, updateClient, pauseClient }
 }
