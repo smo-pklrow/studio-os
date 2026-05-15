@@ -111,6 +111,14 @@ create table public.inspo_items (
   created_at timestamptz not null default now()
 );
 
+create table public.task_links (
+  id         uuid primary key default gen_random_uuid(),
+  task_id    uuid not null references public.tasks(id) on delete cascade,
+  url        text not null,
+  label      text not null,
+  created_at timestamptz not null default now()
+);
+
 create table public.brain_dump_cards (
   id         uuid primary key default gen_random_uuid(),
   client_id  uuid not null references public.clients(id) on delete cascade,
@@ -148,6 +156,7 @@ alter table public.subtasks         enable row level security;
 alter table public.notes            enable row level security;
 alter table public.files            enable row level security;
 alter table public.inspo_items      enable row level security;
+alter table public.task_links      enable row level security;
 alter table public.brain_dump_cards enable row level security;
 alter table public.client_context   enable row level security;
 
@@ -283,6 +292,19 @@ create policy "Owner manages inspo"
       join public.task_groups tg on tg.id = t.group_id
       join public.clients c      on c.id  = tg.client_id
       where t.id = inspo_items.task_id
+      and   c.owner_id = auth.uid()
+    )
+  );
+
+-- task_links
+create policy "Owner manages task links"
+  on public.task_links for all
+  using (
+    exists (
+      select 1 from public.tasks t
+      join public.task_groups tg on tg.id = t.group_id
+      join public.clients c      on c.id  = tg.client_id
+      where t.id = task_links.task_id
       and   c.owner_id = auth.uid()
     )
   );

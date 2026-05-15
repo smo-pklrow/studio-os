@@ -2,7 +2,7 @@
 
 > Update this file after every session. Mark tasks `[x]` when complete. Add blockers inline.
 
-**Current phase**: Phase 2 — Core UX Completion (2C done → 2D next)
+**Current phase**: Phase 2 — Core UX Completion (2D done → 2E next)
 **Last updated**: 2026-05-15
 
 ---
@@ -62,7 +62,7 @@ Items are ordered by build priority. Do not skip ahead — each group unblocks t
 
 ---
 
-### 2D — Task Detail (Level 3) `[AFTER 2A–2C]`
+### 2D — Task Detail (Level 3) `[COMPLETE]`
 
 > Completes the drill-down. Clicking a task title currently leads nowhere.
 
@@ -232,7 +232,7 @@ Items are ordered by build priority. Do not skip ahead — each group unblocks t
 | `supabase/schema.sql` | Full initial schema — run once | Done |
 | `migrations/002_client_branding.sql` | Add `color`, `logo_url` to `clients` | Run in SQL Editor |
 | `migrations/003_fix_rls_recursion.sql` | Drop circular subcontractor policies | Run in SQL Editor |
-| `migrations/004_task_detail.sql` | Any task detail columns needed | Pending |
+| `migrations/004_task_detail.sql` | `task_links` table + RLS policy | Run in SQL Editor |
 | `migrations/005_portal_rls.sql` | RLS policy: public read by `share_token` | Pending |
 | `migrations/006_studio_name.sql` | Add `studio_name` to `profiles` | Pending |
 
