@@ -2,7 +2,7 @@
 
 > Update this file after every session. Mark tasks `[x]` when complete. Add blockers inline.
 
-**Current phase**: Phase 2 — Core UX Completion (2E done → 2F next)
+**Current phase**: Phase 2 — Core UX Completion (2F done → 2G next)
 **Last updated**: 2026-05-15
 
 ---
@@ -104,17 +104,17 @@ Items are ordered by build priority. Do not skip ahead — each group unblocks t
 
 ---
 
-### 2F — Settings & Admin `[AFTER 2E]`
+### 2F — Settings & Admin `[COMPLETE]`
 
 > Needed before any real user can adopt this as their primary tool.
 
-- [ ] Settings page — route `/settings`, accessible from nav
-- [ ] Profile section — display name (from Google), avatar display
-- [ ] Studio name — stored in `profiles.studio_name`; shown in portal header and nav
-- [ ] Theme toggle — dark / light; dark-only for now, light mode deferred
-- [ ] Notification preferences — digest day + time (placeholder; wired in Phase 3)
-- [ ] Danger zone — Sign out button, delete account (with confirmation)
-- [ ] Schema migration — add `studio_name text` to `profiles` — `supabase/migrations/006_studio_name.sql`
+- [x] Settings page — route `/settings`, accessible from nav
+- [x] Profile section — display name (from Google), avatar display
+- [x] Studio name — stored in `profiles.studio_name`; shown in portal header and nav
+- [x] Theme toggle — dark / light; dark-only for now, light mode deferred
+- [x] Notification preferences — digest day + time (placeholder; wired in Phase 3)
+- [x] Danger zone — Sign out button, delete account (with confirmation)
+- [x] Schema migration — add `studio_name text` to `profiles` — `supabase/migrations/006_studio_name.sql`
 
 ---
 
@@ -234,7 +234,7 @@ Items are ordered by build priority. Do not skip ahead — each group unblocks t
 | `migrations/003_fix_rls_recursion.sql` | Drop circular subcontractor policies | Run in SQL Editor |
 | `migrations/004_task_detail.sql` | `task_links` table + RLS policy | Run in SQL Editor |
 | `migrations/005_portal_rls.sql` | RLS policy: public read by `share_token` | Run in SQL Editor |
-| `migrations/006_studio_name.sql` | Add `studio_name` to `profiles` | Pending |
+| `migrations/006_studio_name.sql` | Add `studio_name` to `profiles` | Run in SQL Editor |
 
 ---
 

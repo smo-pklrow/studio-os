@@ -15,6 +15,7 @@ create table public.profiles (
   avatar_url  text,
   role        text not null default 'owner'
                    check (role in ('owner', 'subcontractor')),
+  studio_name text,
   created_at  timestamptz not null default now()
 );
 

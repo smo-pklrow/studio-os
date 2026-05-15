@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import logoUrl from '../../assets/logo.png'
 
-export default function NavBar({ user }) {
+export default function NavBar({ user, studioName }) {
   const location = useLocation()
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -45,7 +45,7 @@ export default function NavBar({ user }) {
       {/* Logo */}
       <Link to="/" className="flex items-center gap-2 opacity-90 hover:opacity-100 transition-opacity">
         <img src={logoUrl} alt="Studio OS" className="h-5 w-auto" />
-        <span className="text-dark-text font-medium text-sm">Studio OS</span>
+        <span className="text-dark-text font-medium text-sm">{studioName || 'Studio OS'}</span>
       </Link>
 
       {/* Right side */}
