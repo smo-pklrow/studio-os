@@ -21,10 +21,10 @@
 ## Phase 2 — Core UX Completion `[IN PROGRESS]`
 
 ### Dashboard (Level 1)
-- [ ] ClientCard component with status badge, last-activity timestamp
-- [ ] Empty state (no clients yet)
-- [ ] Add client modal (name, color, logo upload)
-- [ ] Archive client flow
+- [x] ClientCard component with status badge, last-activity timestamp
+- [x] Empty state (no clients yet)
+- [x] Add client modal (name, project name)
+- [x] Archive client flow
 
 ### Client Board (Level 2)
 - [ ] Tasks tab — full CRUD with drag-drop reorder
@@ -43,7 +43,7 @@
 - [ ] Read-only task list with status
 
 ### Hooks refactor
-- [ ] `useClients` — fetch, create, archive, update
+- [x] `useClients` — fetch, create, archive, update
 - [ ] `useTasks` — fetch by client, CRUD, reorder
 - [ ] `useBrainDump` — fetch by client, CRUD
 
