@@ -46,7 +46,7 @@ export default function ClientBoard() {
   }
 
   return (
-    <div className="min-h-dvh flex flex-col">
+    <div className="flex flex-col flex-1">
 
       <ClientHeader client={client} stats={stats} />
 

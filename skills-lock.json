@@ -1,11 +1,41 @@
 {
   "version": 1,
   "skills": {
+    "blue-ocean-strategy": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "skillPath": "blue-ocean-strategy/SKILL.md",
+      "computedHash": "9e00afc4bf6f6c334527411dc3bc3206bea9ad27db14e2359c74d8eef73f2520"
+    },
+    "drive-motivation": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "skillPath": "drive-motivation/SKILL.md",
+      "computedHash": "ac3c8382dd88c3a3894eee8f3809e45fcc7bfb953fb51562294b6c3b39a09a2e"
+    },
+    "mom-test": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "skillPath": "mom-test/SKILL.md",
+      "computedHash": "f0d3ed49b4f0dd3f7c0bab00b2550e8c215fbacd66aa3f131d5efa980a35cb2f"
+    },
+    "obviously-awesome": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "skillPath": "obviously-awesome/SKILL.md",
+      "computedHash": "7536951d66f2d02e05e0ba9cf6add964f42083012604e4a635e007f0b6fdbc03"
+    },
     "shannon": {
       "source": "unicodeveloper/shannon",
       "sourceType": "github",
       "skillPath": "SKILL.md",
       "computedHash": "a63c0a99388e6ca1ecd553f59c11acf32acdb1201f7c899294397d8ee3cc8b5b"
+    },
+    "web-typography": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "skillPath": "web-typography/SKILL.md",
+      "computedHash": "be06b421155bd61ddf02e0cc7b0067cec6165672ec29b39fb83d2c19a746126f"
     }
   }
 }

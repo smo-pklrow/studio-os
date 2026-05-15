@@ -20,22 +20,18 @@ export default function Dashboard() {
   const [showModal, setShowModal] = useState(false)
 
   return (
-    <div className="min-h-dvh flex flex-col">
+    <div className="flex flex-col flex-1">
 
       {/* ── Header ─────────────────────────────────────────────── */}
       <header className="border-b" style={{ borderColor: 'var(--border-subtle)' }}>
         <div className="max-w-5xl mx-auto w-full px-6 py-4 flex items-center justify-between">
           <div>
-            <div className="flex items-center gap-2.5">
-              <div className="w-3.5 h-3.5 rounded-sm bg-brand-green" />
-              <h1 className="text-dark-text font-medium text-base">Studio OS</h1>
-            </div>
-            <p className="text-dark-muted text-xs mt-0.5 pl-6">
-              {formatHeaderDate()}
-              {!loading && (
-                <> · {clients.length} active client{clients.length !== 1 ? 's' : ''}</>
-              )}
-            </p>
+            <p className="text-dark-text text-sm font-medium">{formatHeaderDate()}</p>
+            {!loading && (
+              <p className="text-dark-muted text-xs mt-0.5">
+                {clients.length} active client{clients.length !== 1 ? 's' : ''}
+              </p>
+            )}
           </div>
           <button className="btn btn-primary" onClick={() => setShowModal(true)}>
             + New client

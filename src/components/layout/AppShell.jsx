@@ -1,6 +1,7 @@
 import { Outlet, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase.js'
+import NavBar from './NavBar.jsx'
 
 export default function AppShell() {
   const navigate = useNavigate()
@@ -23,8 +24,11 @@ export default function AppShell() {
   if (!user) return null
 
   return (
-    <div className="min-h-dvh bg-dark-bg flex flex-col">
-      <Outlet />
+    <div className="min-h-dvh flex flex-col">
+      <NavBar user={user} />
+      <div className="flex-1 flex flex-col">
+        <Outlet />
+      </div>
     </div>
   )
 }
