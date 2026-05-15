@@ -19,11 +19,27 @@ export function useClients() {
       })
   }, [])
 
-  async function createClient(fields) {
+  async function createClient(fields, logoFile) {
     const { data: { user } } = await supabase.auth.getUser()
+
+    let logo_url = null
+    if (logoFile) {
+      const ext = logoFile.name.split('.').pop()
+      const path = `${user.id}/${Date.now()}.${ext}`
+      const { data: upload, error: uploadError } = await supabase.storage
+        .from('client-logos')
+        .upload(path, logoFile, { contentType: logoFile.type })
+      if (!uploadError) {
+        const { data: { publicUrl } } = supabase.storage
+          .from('client-logos')
+          .getPublicUrl(upload.path)
+        logo_url = publicUrl
+      }
+    }
+
     const { data, error } = await supabase
       .from('clients')
-      .insert({ ...fields, owner_id: user.id })
+      .insert({ ...fields, logo_url, owner_id: user.id })
       .select()
       .single()
     if (!error) setClients(prev => [data, ...prev])

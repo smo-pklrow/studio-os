@@ -35,7 +35,7 @@ Secondary: **The Client** — receives a read-only portal link showing progress,
 | Feature | Description | Status |
 |---|---|---|
 | Google OAuth login | Single-user auth for studio owner | Done |
-| Client list (Dashboard) | Cards showing all active clients, status, last activity | In progress |
+| Client list (Dashboard) | Cards showing all active clients, status, last activity, brand color, and logo | In progress |
 | Client board | Per-client view: tasks tab + brain dump tab | In progress |
 | Task management | Create, edit, reorder (drag-drop), status workflow | Scaffolded |
 | Brain dump | Free-form note cards per client with AI tagging | Scaffolded |

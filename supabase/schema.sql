@@ -23,6 +23,8 @@ create table public.clients (
   owner_id     uuid not null references public.profiles(id) on delete cascade,
   name         text not null,
   project_name text,
+  color        text,
+  logo_url     text,
   status       text not null default 'active'
                     check (status in ('active', 'paused', 'archived')),
   health       text not null default 'on_track'
@@ -34,6 +36,9 @@ create table public.clients (
   created_at   timestamptz not null default now(),
   updated_at   timestamptz not null default now()
 );
+
+-- Storage bucket for client logos (create manually in Supabase dashboard)
+-- Storage > New bucket: client-logos (private) image/*
 
 create table public.task_groups (
   id           uuid primary key default gen_random_uuid(),

@@ -49,39 +49,66 @@ export default function ClientCard({ client, onArchive, className = '' }) {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [menuOpen])
 
+  const accentColor = client.color || 'var(--color-brand)'
+  const initial = client.name?.[0]?.toUpperCase() ?? '?'
+
   return (
     <div
-      className={`card card-interactive group relative p-5 flex flex-col gap-3 ${className}`}
+      className={`card card-interactive group relative flex flex-col overflow-hidden ${className}`}
       onClick={() => navigate(`/client/${client.id}`)}
     >
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <h3 className="text-dark-text font-medium text-sm leading-snug truncate">{client.name}</h3>
-          {client.project_name && (
-            <p className="text-dark-muted text-xs mt-0.5 truncate">{client.project_name}</p>
-          )}
+      {/* Brand color strip across top */}
+      <div className="h-[3px] w-full shrink-0" style={{ backgroundColor: accentColor }} />
+
+      <div className="p-5 flex flex-col gap-3 flex-1">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex items-center gap-3 min-w-0">
+            {/* Logo or initial avatar */}
+            {client.logo_url ? (
+              <img
+                src={client.logo_url}
+                alt=""
+                className="w-9 h-9 rounded-lg object-cover shrink-0 border border-dark-border"
+              />
+            ) : (
+              <div
+                className="w-9 h-9 rounded-lg flex items-center justify-center text-sm font-semibold shrink-0 select-none"
+                style={{ backgroundColor: accentColor + '28', color: accentColor }}
+              >
+                {initial}
+              </div>
+            )}
+
+            <div className="min-w-0">
+              <h3 className="text-dark-text font-medium text-sm leading-snug truncate">{client.name}</h3>
+              {client.project_name && (
+                <p className="text-dark-muted text-xs mt-0.5 truncate">{client.project_name}</p>
+              )}
+            </div>
+          </div>
+
+          <button
+            className="shrink-0 w-7 h-7 flex items-center justify-center rounded-lg opacity-0 group-hover:opacity-100 hover:bg-dark-elevated text-dark-subtle hover:text-dark-muted transition-all"
+            onClick={(e) => { e.stopPropagation(); setMenuOpen(v => !v) }}
+            aria-label="Client options"
+          >
+            <span className="tracking-widest text-sm leading-none select-none">···</span>
+          </button>
         </div>
-        <button
-          className="shrink-0 w-7 h-7 flex items-center justify-center rounded-lg opacity-0 group-hover:opacity-100 hover:bg-dark-elevated text-dark-subtle hover:text-dark-muted transition-all"
-          onClick={(e) => { e.stopPropagation(); setMenuOpen(v => !v) }}
-          aria-label="Client options"
-        >
-          <span className="tracking-widest text-sm leading-none select-none">···</span>
-        </button>
-      </div>
 
-      <div className="flex items-center gap-1.5 flex-wrap">
-        <span className={`badge ${STATUS_BADGE[client.status]}`}>
-          {client.status}
-        </span>
-        <span className={`badge ${HEALTH_BADGE[client.health]}`}>
-          {HEALTH_LABEL[client.health]}
-        </span>
-      </div>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className={`badge ${STATUS_BADGE[client.status]}`}>
+            {client.status}
+          </span>
+          <span className={`badge ${HEALTH_BADGE[client.health]}`}>
+            {HEALTH_LABEL[client.health]}
+          </span>
+        </div>
 
-      <p className="text-dark-subtle text-xs mt-auto">
-        Updated {relativeTime(client.updated_at)}
-      </p>
+        <p className="text-dark-subtle text-xs mt-auto">
+          Updated {relativeTime(client.updated_at)}
+        </p>
+      </div>
 
       {menuOpen && (
         <div

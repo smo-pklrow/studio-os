@@ -90,12 +90,22 @@ export function useClients() {
 Confirm actuals in `supabase/schema.sql`. Expected shape:
 
 ```sql
-clients        (id, user_id, name, color, logo_url, status, created_at)
-tasks          (id, client_id, title, description, status, position, due_date, created_at)
-brain_dump     (id, client_id, content, tags, created_at)
-portals        (id, client_id, token, created_at)
-task_files     (id, task_id, file_path, file_name, created_at)
+clients          (id, owner_id, name, project_name, color, logo_url, status, health, start_date, due_date, share_token, created_at, updated_at)
+task_groups      (id, client_id, name, color, sort_order, created_at)
+tasks            (id, group_id, title, description, status, priority, due_date, sort_order, created_at, updated_at)
+task_assignments (id, task_id, user_id)
+subtasks         (id, task_id, title, done, assignee_id, sort_order, created_at)
+notes            (id, task_id, author_id, body, created_at)
+files            (id, task_id, uploaded_by, filename, storage_path, size_bytes, mime_type, created_at)
+inspo_items      (id, task_id, type, content, caption, sort_order, created_at)
+brain_dump_cards (id, client_id, type, content, color, pos_x, pos_y, width, created_at, updated_at)
+client_context   (id, client_id, entry_type, body, source, created_at)
+profiles         (id, full_name, avatar_url, role, created_at)
 ```
+
+`color` and `logo_url` on `clients` are pending migration — add via SQL Editor, then update `supabase/schema.sql`.
+
+Storage buckets: `task-files` (private), `brain-dump-images` (private), `client-logos` (private).
 
 RLS: all tables filtered by `auth.uid() = user_id` (or join to clients.user_id).
 `portals` table: read allowed without auth if `token` matches.

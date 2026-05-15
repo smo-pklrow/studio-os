@@ -25,6 +25,9 @@
 - [x] Empty state (no clients yet)
 - [x] Add client modal (name, project name)
 - [x] Archive client flow
+- [x] Client color — per-client brand color picker (stored in `clients.color`)
+- [x] Client logo — upload via Supabase Storage `client-logos` bucket (stored in `clients.logo_url`); show in ClientCard + Client Board header
+- [x] Schema migration — `supabase/migrations/002_client_branding.sql` (run in SQL Editor)
 
 ### Client Board (Level 2)
 - [ ] Tasks tab — full CRUD with drag-drop reorder
