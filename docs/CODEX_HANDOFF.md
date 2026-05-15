@@ -33,11 +33,11 @@ src/components/<feature>/<ComponentName>.jsx
 Current component tree:
 ```
 components/
-  layout/     AppShell, WeekCalendar, DigestStrip, StatsBar
-  clients/    ClientCard, ClientRow, ClientHeader, AddClientModal
+  layout/     AppShell, NavBar, WeekCalendar, DigestStrip, StatsBar
+  clients/    ClientRow, ClientHeader, AddClientModal, EditClientModal
   tasks/      TaskGroup, TaskRow, AddTaskRow
   braindump/  BrainDumpCanvas, BrainDumpCard
-  shared/     (Badge, Button, Avatar — not yet built)
+  shared/     ErrorBoundary, Toast (+ ToastProvider + useToast), CommandPalette
 ```
 
 - PascalCase filenames
@@ -165,11 +165,12 @@ const { data } = await supabase.functions.invoke('generate-brief', { body: { ent
 ## Routing structure
 
 ```
-/              → Dashboard (protected)
-/client/:id    → ClientBoard (protected)
-/task/:id      → TaskDetail (protected)
-/portal/:token → ClientPortal (public)
-/login         → Login
+/                              → Dashboard (protected)
+/client/:clientId              → ClientBoard (protected)
+/client/:clientId/task/:taskId → TaskDetail (protected)
+/portal/:shareToken            → ClientPortal (public — no auth)
+/settings                      → Settings (protected)
+/login                         → Login
 ```
 
 Auth guard lives in `src/components/layout/AppShell.jsx`.
@@ -178,15 +179,21 @@ Auth guard lives in `src/components/layout/AppShell.jsx`.
 
 ## Styling tokens
 
-Defined in `src/styles/index.css`. Key design decisions:
-- Background: `zinc-950` (near black)
-- Cards: `zinc-900`
-- Hover: `zinc-800`
-- Accent: `violet-500` (primary actions)
-- Destructive: `red-500`
-- Text primary: `zinc-100`
-- Text muted: `zinc-400`
-- Border: `zinc-800`
+Defined in `src/styles/index.css` as CSS custom properties on `:root`. **Do not use Tailwind color values like `zinc-950` or `violet-500` — they do not exist in this design system.** Use the token names below.
+
+Key tokens:
+- `--color-bg`: `#1E1E1C` — page background
+- `--color-surface` / `var(--color-card)`: `#252523` — card/panel background
+- `--color-elevated`: `#2A2A28` — hover states, dropdowns
+- `--color-brand`: `#1D9E75` — primary action green
+- `--color-text`: `#E8E6DF` — primary text
+- `--color-muted`: `#9C9A92` — secondary/meta text
+- `--color-subtle`: `#6B6963` — placeholder, disabled
+- `--border-default`: `rgba(255,255,255,0.08)` — card borders
+- `--font-sans`: `'DM Sans', system-ui, sans-serif` — all UI text
+- `--font-display`: `'DM Serif Display', Georgia, serif` — display moments 28px+ only
+
+Full token reference: `docs/DESIGN_TOKENS.md`
 
 ---
 

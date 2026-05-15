@@ -128,6 +128,30 @@ Items are ordered by build priority. Do not skip ahead — each group unblocks t
 - [ ] Week calendar events — deferred to Phase 3 (Google Calendar MCP)
 - [x] Pause client visual treatment — amber border + opacity on ClientRow (was already built in 2B)
 
+### 2G+ — Design Elevation (pre-Phase 3 polish) `[COMPLETE]`
+
+> Raised the visual and interaction quality from ~7.5 to ~9/10 before handing off to Phase 3. All items documented in `docs/DESIGN_TOKENS.md` → Design Elevation Record.
+
+- [x] **Lenis smooth scroll** — global window scroll via `lenis` npm, initialized in `App.jsx`
+- [x] **DM Serif Display** — display typeface added to `index.html`; `--font-display` CSS var; applied to Dashboard greeting + ClientHeader h1
+- [x] **Time-aware dashboard greeting** — "Good morning/afternoon/evening, [FirstName]" using `supabase.auth.getUser()` → `user_metadata.full_name`
+- [x] **Dashboard insight line** — single-sentence studio state summary (overdue > needs attention > all clear) below greeting
+- [x] **Portal onboarding nudge** — dismissible inline banner; copies first client portal URL; state persisted in `localStorage`
+- [x] **Toast notification system** — `ToastProvider` + `useToast()` hook in `src/components/shared/Toast.jsx`; used for clipboard copy confirmations
+- [x] **CSS-only tooltip system** — `.tooltip` class + `data-tip` attribute; applied to all icon-only buttons (drag handle, delete, priority, status, collapse, color dot)
+- [x] **Sticky task group headers** — `.task-group-header` in `index.css`; `position: sticky`, `backdrop-filter: blur(12px)`, full-bleed via negative margins
+- [x] **Scroll-active group indicator** — `IntersectionObserver` in `TaskGroup.jsx`; color dot pulses + scales when group is in active viewport band
+- [x] **Animated task done strikethrough** — `@keyframes strike-through` on `.task-title-done::after` pseudo-element; left-to-right animated line on task completion
+- [x] **Checkbox satisfaction animation** — `@keyframes checkbox-pop` scale pulse on done toggle; detected via `prevDone` ref in `TaskRow.jsx`
+- [x] **Animated progress bars** — `requestAnimationFrame` from 0 to actual pct on mount in `ClientRow.jsx`
+- [x] **View Transitions API** — shared-element morph (client avatar card → header); `document.startViewTransition` + `flushSync` in `ClientRow.jsx`; `viewTransitionName` per client ID
+- [x] **Browser theme-color** — `<meta name="theme-color">` set dynamically to `client.color` in `ClientBoard.jsx`; resets on unmount
+- [x] **Keyboard shortcut `N`** — opens Add Client modal (Dashboard) or new group form (ClientBoard) when not focused on input
+- [x] **`⌘K` command palette** — `CommandPalette.jsx` shell; global listener in `App.jsx`; navigates to `/` and `/settings`; Phase 3 placeholders for AI tools + calendar
+- [x] **Staggered reveal animations** — task groups animate in with `animate-fade-up animate-delay-{1-4}` on ClientBoard load
+- [x] **Counting animation in StatsBar** — `useCountUp` hook with cubic ease-out; all four stat tiles count from 0 on load
+- [x] **Client color accent on ClientRow** — `borderLeftColor: accentColor, borderLeftWidth: '3px'` for visual identity per client
+
 ---
 
 ### Hooks — all done ✓

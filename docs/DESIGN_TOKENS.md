@@ -71,17 +71,33 @@ All colors are defined as CSS variables in `src/styles/index.css`. Dark mode onl
 
 ## Typography
 
-Font family: **DM Sans** — loaded via Google Fonts in `index.html`. Fallback: `system-ui, sans-serif`.
+Two typefaces. One system. **Never mix roles.**
 
-| Role | Size | Weight | Color token | Usage |
-|---|---|---|---|---|
-| App name / page title | `17–18px` | `500` | `--text-primary` | Studio OS wordmark, client titles |
-| Section heading | `15px` | `500` | `--text-primary` | Card headers, group names |
-| Body / task title | `13–14px` | `400` | `--text-primary` | Task rows, description text |
-| Label / badge | `11–12px` | `500` | varies by status | Badges, pills, metadata |
-| Caption / timestamp | `11px` | `400` | `--text-subtle` | Dates, "2h ago", file sizes |
+### Font families
+
+| Variable | Family | Loaded via | Role |
+|---|---|---|---|
+| `--font-sans` (default) | **DM Sans** | Google Fonts in `index.html` | UI, body, labels, badges, all interactive elements |
+| `--font-display` | **DM Serif Display** | Google Fonts in `index.html` | Display moments only — 28px and above |
+
+**The rule**: `--font-display` appears in exactly two places — the Dashboard greeting (`Good morning, Sean.`) and the Client Board hero heading (`h1` client name). Nowhere else. Do not use it for labels, body text, badges, or buttons.
+
+DM Serif Display was designed by Colophon Foundry as the serif sibling to DM Sans. The pairing is architecturally correct — same proportions, contrasting personalities. The contrast between the two creates typographic hierarchy without any tonal mismatch.
+
+### Type scale
+
+| Role | Font | Size | Weight | Color token | Usage |
+|---|---|---|---|---|---|
+| Display / greeting | `--font-display` | `clamp(26px, 3.5vw, 36px)` | `400` | `--color-text` | Dashboard greeting, client board h1 |
+| App name / page title | `--font-sans` | `17–18px` | `500` | `--color-text` | Studio OS wordmark, nav items |
+| Section heading | `--font-sans` | `15px` | `500` | `--color-text` | Card headers, group names |
+| Body / task title | `--font-sans` | `13–14px` | `400` | `--color-text` | Task rows, description text |
+| Label / badge | `--font-sans` | `11–12px` | `500` | varies by status | Badges, pills, metadata |
+| Caption / timestamp | `--font-sans` | `11px` | `400` | `--color-subtle` | Dates, "2h ago", file sizes |
 
 Line height: `1.5` for body text, `1.4` for compact rows, `1.6` for description fields.
+
+Letter spacing: `-0.02em` on display text, `-0.01em` on section headings, `0` on body.
 
 ---
 
@@ -449,256 +465,101 @@ Dark is the default and only mode at this stage. The `<html>` element has `class
 
 ---
 
-## Design Elevation Roadmap
+## Design Elevation Record
 
-> Current score: **~7.5–8/10**. This section documents what it would take to reach 9 and 10. These are not Phase 2 items — they are deliberate craft investments for when the product is stable and the design deserves its final form. Read before touching typography or motion.
-
----
-
-### From 8 → 9: Exceptional
-
-A 9/10 design has at least one moment that stops someone mid-scroll. Typography gasps. Every interaction feels considered. The score gap between 8 and 9 is not incremental — it requires three deliberate investments.
+> **Current score: ~9/10.** All items below have been built. This section documents what was done and why — read before touching typography, motion, or interactive details.
 
 ---
 
-#### 1. Display typeface with personality
+### Built: 8 → 9 investments
 
-**The problem**: DM Sans is an excellent body/UI typeface — legible, neutral, professional. That neutrality is also its weakness. It has no signature. The dashboard greeting (`Good morning, Sean.`) is the app's biggest typographic moment and it reads like system UI.
+#### DM Serif Display — display typeface with personality `[BUILT]`
 
-**The fix**: Introduce a second typeface, used exclusively at display scale. Not everywhere — just:
-- The dashboard greeting (`Good morning, Sean.`)
-- The client name in `ClientHeader` (`h1` — currently DM Sans 500)
-- Optional: client names in `ClientRow` at some future larger scale
+DM Serif Display is loaded in `index.html` and registered as `--font-display` in `:root`. It appears in exactly two places:
+- Dashboard greeting: `Good morning, Sean.` at `clamp(26px, 3.5vw, 36px)` weight 400
+- ClientHeader hero `h1`: client name at `clamp(24px, 3.5vw, 36px)` with `letter-spacing: -0.02em`
 
-**Recommended options** (free via Google Fonts, no CDN change required):
+The project name renders below in `text-sm` DM Sans so the two lines have clear typographic hierarchy.
 
-| Font | Character | Best for |
+**Rule**: `--font-display` at 28px+. DM Sans everywhere else. Non-negotiable.
+
+---
+
+#### Sticky task group headers `[BUILT]`
+
+`.task-group-header` in `index.css` makes each group header sticky as the user scrolls through tasks. Uses `position: sticky; top: 0; z-index: 10` with `backdrop-filter: blur(12px)` and a semi-transparent `rgba(30,30,28,0.88)` background so content below bleeds through. Negative horizontal margins (`-24px`) give the header a full-width bleed against the constrained content column.
+
+Effect: board with 40+ tasks reads as navigable chapters rather than an undifferentiated scroll.
+
+---
+
+#### Animated task done strikethrough `[BUILT]`
+
+`.task-title-done` in `index.css` applies a CSS-animated strikethrough via `::after` pseudo-element (cannot animate `text-decoration: line-through` — it's non-interpolatable). The `@keyframes strike-through` animates `width` from `0` to `100%` in `280ms`. The checkbox also pops with a `@keyframes checkbox-pop` scale animation (`1 → 1.3 → 1`) detected by `prevDone` ref in `TaskRow.jsx`.
+
+---
+
+#### Client name as hero type in ClientHeader `[BUILT]`
+
+The `h1` in `ClientHeader.jsx` uses `--font-display` at `clamp(24px, 3.5vw, 36px)` with `letter-spacing: -0.02em`. Project name is a separate `<p>` below in `text-sm` muted — this creates hierarchy and makes entering a client board feel immersive.
+
+---
+
+### Built: 9 → 10 investments
+
+#### View Transitions API — page morphing `[BUILT]`
+
+`ClientRow.jsx` wraps `navigate()` in `document.startViewTransition()` with a `flushSync` guard. The client avatar in `ClientRow` and `ClientHeader` both carry `viewTransitionName: \`client-avatar-${client.id}\`` — unique per client to satisfy the spec requirement. The browser interpolates position, size, and border-radius across the route change. CSS in `index.css` (`::view-transition-old(root)`, `::view-transition-new(root)`) controls the cross-fade.
+
+Graceful degradation: `if (!document.startViewTransition)` guard ensures unsupported browsers get the hard cut.
+
+---
+
+#### Scroll-active group indicator `[BUILT]`
+
+`TaskGroup.jsx` uses an `IntersectionObserver` on `headerRef` with `rootMargin: '-8% 0px -80% 0px'`. When a group header enters the active viewport band, `isActive` flips to `true`. The color dot responds: `transform: scale(1.25)` + `boxShadow: \`0 0 0 3px ${group.color}40\``. Combined with the sticky header, this creates a continuous "you are here" signal as the user scrolls.
+
+---
+
+#### Animated progress bars in ClientRow `[BUILT]`
+
+`ClientRow.jsx` uses a `requestAnimationFrame` loop in `useEffect` to animate the progress bar from `0` to the actual completion percentage on mount. Makes progress feel earned rather than static — a detail no one names but everyone notices.
+
+---
+
+#### Browser theme-color matches client `[BUILT]`
+
+`ClientBoard.jsx` sets `<meta name="theme-color">` dynamically to `client.color` on mount via `useEffect`. On unmount, resets to `#1E1E1C`. Browser chrome (mobile address bar, desktop tab strip in supported browsers) matches the client's brand.
+
+---
+
+#### `N` keyboard shortcut `[BUILT]`
+
+- **Dashboard**: `N` opens the Add Client modal when focus is not on an input/textarea
+- **ClientBoard**: `N` opens the new group form and focuses the group name input (50ms `setTimeout` to let form mount first)
+
+Both use a shared pattern: keydown listener checks `active.tagName`, guards against `metaKey`/`ctrlKey`, and calls `e.preventDefault()`.
+
+---
+
+#### `⌘K` command palette `[BUILT]`
+
+`src/components/shared/CommandPalette.jsx` — modal overlay with backdrop dismiss, search input, filtered results from `PLACEHOLDER_ITEMS`. Navigates to `/` (Go to dashboard) and `/settings` (Open settings). Two Phase 3 shells: "AI tools" and "Calendar integrations" with "Coming in Phase 3" hints.
+
+Wired globally in `App.jsx`: `useEffect` keydown listener for `(e.metaKey || e.ctrlKey) && e.key === 'k'`, toggles `paletteOpen` state. Renders above all routes inside `<ToastProvider>`.
+
+---
+
+#### Smooth number transitions in StatsBar `[BUILT]`
+
+`StatsBar.jsx` uses a `useCountUp(target, duration)` hook: `requestAnimationFrame` loop with cubic ease-out (`1 - Math.pow(1 - progress, 3)`). Each stat tile counts from `0` to its value over `650ms` on first load. Makes the numbers feel alive — data arrives, not appears.
+
+---
+
+### Remaining to reach 10/10
+
+| Detail | Status | Notes |
 |---|---|---|
-| **Instrument Serif** | Elegant, editorial, slightly literary | "Studio OS is a thinking tool for creative professionals" |
-| **Fraunces** | Optical-size variable, soft serifs, warm | A tool with personality and a point of view |
-| **Playfair Display** | High-contrast, classical, confident | Makes headlines feel important and permanent |
-| **DM Serif Display** | Sister font to DM Sans — same DNA, serif drama | Easiest pairing: zero tonal mismatch, immediate contrast |
-
-**Recommendation: DM Serif Display** — it was designed to pair with DM Sans (same family by Colophon Foundry via Google). The contrast between the two creates the typographic architecture the app needs with zero risk of aesthetic mismatch.
-
-**Implementation**:
-```html
-<!-- Add to index.html alongside DM Sans -->
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
-```
-
-```css
-/* Add to :root in index.css */
---font-display: 'DM Serif Display', Georgia, serif;
-```
-
-```jsx
-/* Dashboard greeting — change from font-medium to display font */
-<h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(28px, 4vw, 38px)', fontWeight: 400 }}>
-  Good morning, Sean.
-</h1>
-
-/* ClientHeader h1 — same treatment */
-<h1 style={{ fontFamily: 'var(--font-display)', fontSize: '28px', fontWeight: 400 }}>
-  {client.name}
-</h1>
-```
-
-**The rule**: Display font at 28px+, DM Sans everywhere else. No exceptions. Do not use the display font for body text, badges, or UI labels.
-
----
-
-#### 2. Signature scroll moment on the Client Board
-
-**The problem**: The task board loads all groups simultaneously. Scrolling through it feels like scrolling through a spreadsheet — content flows but nothing *tells a story*. There is no moment where the studio owner feels like the tool understands their work.
-
-**The signature moment**: A **sticky group header** that pins each `TaskGroup` name as you scroll through its tasks, releasing only when the next group takes over. This is the equivalent of a chapter marker in a book — it tells you exactly where you are in the project without looking up.
-
-**How to build it**:
-```css
-/* In index.css — make group header sticky */
-.task-group-header {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background-color: var(--color-bg);
-  /* subtle backdrop blur for depth */
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  background-color: rgba(30, 30, 28, 0.85);
-  padding-top: 8px;
-  padding-bottom: 8px;
-  margin-left: -24px;
-  margin-right: -24px;
-  padding-left: 24px;
-  padding-right: 24px;
-}
-```
-
-Apply `.task-group-header` to the group header `div` in `TaskGroup.jsx`. As the user scrolls, each group name sticks at the top of the viewport until the next group pushes it off. At scale, this makes a board with 40+ tasks feel navigable and intentional rather than overwhelming.
-
-**Secondary moment — task row micro-animation**: When a task is marked done (checkbox click), the title should gain `line-through` with a left-to-right strikethrough animation rather than an instant toggle:
-
-```css
-.task-done-strike {
-  position: relative;
-}
-.task-done-strike::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  height: 1px;
-  background-color: var(--color-subtle);
-  width: 0;
-  animation: strike-through 300ms var(--ease-out) forwards;
-}
-@keyframes strike-through {
-  to { width: 100%; }
-}
-```
-
-This is the kind of micro-detail that makes task completion feel *satisfying* — the UI confirms the action in a way that's proportional to the effort it took.
-
----
-
-#### 3. Viewport-filling client name on the Client Board header
-
-**The problem**: `ClientHeader` shows the client name at 21px DM Sans. For a tool where each client is a world unto itself, that entry moment should feel like walking into a room. The client board is the studio owner's dedicated space for that client — it should feel immersive.
-
-**The fix**: On `ClientBoard`, treat the client name as the hero typographic element. Increase it significantly:
-
-```jsx
-/* ClientHeader h1 — current */
-<h1 className="text-dark-text font-medium text-xl leading-tight truncate">
-  {client.name}{client.project_name && ` — ${client.project_name}`}
-</h1>
-
-/* ClientHeader h1 — 9/10 treatment */
-<h1
-  className="leading-none truncate"
-  style={{
-    fontFamily: 'var(--font-display)',
-    fontSize: 'clamp(26px, 4vw, 40px)',
-    fontWeight: 400,
-    letterSpacing: '-0.02em',
-    color: 'var(--color-text)',
-  }}
->
-  {client.name}
-</h1>
-{client.project_name && (
-  <p className="text-sm mt-1" style={{ color: 'var(--color-muted)' }}>
-    {client.project_name}
-  </p>
-)}
-```
-
-This separates the client identity from the project context, creates a clear typographic hierarchy, and makes the moment of opening a client feel significant rather than navigational.
-
----
-
-### From 9 → 10: World-class
-
-A 10/10 design would be submitted to Awwwards. It requires three things that no amount of small improvements can substitute: **page transitions**, **choreographed identity**, and **a detail layer so considered it rewards zooming in**. These are major investments — each is a multi-day build.
-
----
-
-#### 1. Page transitions with continuity
-
-**The problem**: Dashboard → Client Board → Task Detail are hard cuts. The router swaps pages instantly. At 9/10 this is acceptable. At 10/10 it breaks the illusion that this is one coherent space.
-
-**The fix**: Shared-element transitions using the [View Transitions API](https://developer.mozilla.org/en-US/docs/Web/API/View_Transitions_API), now available in all major browsers (Chrome 111+, Safari 18+, Firefox 130+). No library required.
-
-```css
-/* Assign a view-transition-name to the client card avatar */
-.client-card-avatar {
-  view-transition-name: client-avatar; /* must be unique per element */
-}
-
-/* The same element in ClientHeader gets the same name */
-.client-header-avatar {
-  view-transition-name: client-avatar;
-}
-```
-
-```js
-/* Wrap navigation in startViewTransition */
-import { flushSync } from 'react-dom'
-
-function navigateToClient(id) {
-  if (!document.startViewTransition) {
-    navigate(`/client/${id}`)
-    return
-  }
-  document.startViewTransition(() => {
-    flushSync(() => navigate(`/client/${id}`))
-  })
-}
-```
-
-With this, the client avatar on the dashboard card morphs into the avatar in the client header when you click through. The browser interpolates position, size, and border-radius automatically. The result reads as a single continuous space, not two separate pages.
-
-**Fallback**: The `if (!document.startViewTransition)` guard ensures graceful degradation in unsupported browsers — they get the current hard cut.
-
----
-
-#### 2. Scroll-driven task board choreography
-
-**The problem**: Even with Lenis installed, the client board is static. Content exists; it doesn't *move*. A 10/10 board uses scroll position to create depth, not just reveal.
-
-**The technique**: Intersection Observer on task group headers that triggers a subtle color shift on the active group's color dot — signaling "you are here" as the user scrolls. Combined with the sticky header from the 9/10 section, this creates a reading experience where the UI actively narrates the user's position in the project.
-
-```js
-// In TaskGroup.jsx — observe the group header
-useEffect(() => {
-  const observer = new IntersectionObserver(
-    ([entry]) => setIsActive(entry.isIntersecting),
-    { rootMargin: '-10% 0px -85% 0px' } // active when header is near top of viewport
-  )
-  if (headerRef.current) observer.observe(headerRef.current)
-  return () => observer.disconnect()
-}, [])
-```
-
-```jsx
-/* Color dot — pulses when group is in active viewport zone */
-<button
-  className="w-2.5 h-2.5 rounded-full transition-all duration-300"
-  style={{
-    backgroundColor: group.color,
-    boxShadow: isActive ? `0 0 0 3px ${group.color}33` : 'none',
-    transform: isActive ? 'scale(1.25)' : 'scale(1)',
-  }}
-/>
-```
-
----
-
-#### 3. The detail layer
-
-The gap between 9 and 10 is lived in the details no one explicitly notices but everyone subconsciously feels. Each of the following is small individually; collectively they represent a design at full attention:
-
-| Detail | Where | How |
-|---|---|---|
-| **Animated progress fill on load** | `ClientRow` progress bar | CSS `@keyframes` that animates width from `0` to the actual value on mount — makes progress feel earned, not static |
-| **Checkbox satisfaction animation** | `TaskRow` done toggle | Scale pulse (`1 → 1.2 → 1`) + color fill transition over `240ms` when checking a task done |
-| **Client color in browser tab** | `ClientBoard` page | Set `<meta name="theme-color">` dynamically to `client.color` on mount — the browser chrome matches the client's brand |
-| **Keyboard shortcut `N`** | `Dashboard`, `ClientBoard` | Press `N` to open the "New client" / "New task" modal — signals this is a power tool, not a passive viewer |
-| **`⌘K` command palette shell** | Global | A Phase 3 item but the shell (empty command palette that opens on `⌘K`) signals intent and makes the app feel like professional software |
-| **Focus-visible rings on brand** | All inputs | Replace the default browser outline with `box-shadow: 0 0 0 2px var(--color-brand-deep), 0 0 0 4px rgba(29,158,117,0.25)` — already in CSS tokens, verify it applies universally |
-| **Smooth number transitions in StatsBar** | `StatsBar` | Animate stat numbers counting up from 0 to their value on first load using a simple `requestAnimationFrame` counter — makes data feel alive |
-
----
-
-### Summary
-
-| Score | Key investments |
-|---|---|
-| **8/10** (current) | Lenis scroll, client color accent, staggered reveals, greeting scale, portal nudge |
-| **9/10** | DM Serif Display for display moments, sticky group headers, task done strikethrough animation, client name as hero type |
-| **10/10** | View Transitions API page morphing, scroll-active group indicator, animated progress bars, browser theme-color, `⌘K` shell, number transitions in StatsBar |
-
-**When to build 9**: When Phase 3 (AI panel, calendar, digest) is complete and the product is being used daily. Polish at this level is most impactful when the feature set is stable — premature polish gets thrown away when layouts change.
-
-**When to build 10**: When preparing for a public launch, a design award submission, or a major client pitch. The 10/10 layer is what makes someone share the app unprompted.
+| Focus-visible rings on brand green | Not built | Replace browser default outline with `box-shadow: 0 0 0 2px var(--color-brand-deep), 0 0 0 4px rgba(29,158,117,0.25)` on all inputs, buttons, and interactive elements |
+| Animated progress fill on ClientRow load | Built | requestAnimationFrame from 0 to actual pct |
+| ⌘K palette with real commands | Phase 3 | Currently a shell; wire to real navigation + AI actions in Phase 3 |
