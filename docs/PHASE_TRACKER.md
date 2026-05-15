@@ -2,7 +2,7 @@
 
 > Update this file after every session. Mark tasks `[x]` when complete. Add blockers inline.
 
-**Current phase**: Phase 2 — Core UX Completion (2D done → 2E next)
+**Current phase**: Phase 2 — Core UX Completion (2E done → 2F next)
 **Last updated**: 2026-05-15
 
 ---
@@ -88,19 +88,19 @@ Items are ordered by build priority. Do not skip ahead — each group unblocks t
 
 ---
 
-### 2E — Client Portal `[AFTER 2D]`
+### 2E — Client Portal `[COMPLETE]`
 
 > The client-facing differentiator. Makes the tool feel professional to clients — they get a live view without a login.
 
-- [ ] `/portal/:token` route — public, no auth; matches `clients.share_token`
-- [ ] Portal page layout — Studio name header, client name + project, progress bar, task list
-- [ ] Task groups — read-only, collapsible, with status counts
-- [ ] Task rows — title, status badge, due date; no edit controls
-- [ ] Empty state — "No tasks to show yet"
-- [ ] Invalid / expired token state — clear error message
-- [ ] "Powered by Studio OS" footer (subtle branding)
-- [ ] `usePortal` hook — public fetch by token; no auth required (RLS policy: token match = read access)
-- [ ] Schema migration — RLS policy on `clients` for portal read by `share_token` — `supabase/migrations/005_portal_rls.sql`
+- [x] `/portal/:token` route — public, no auth; matches `clients.share_token`
+- [x] Portal page layout — Studio name header, client name + project, progress bar, task list
+- [x] Task groups — read-only, collapsible, with status counts
+- [x] Task rows — title, status badge, due date; no edit controls
+- [x] Empty state — "No tasks to show yet"
+- [x] Invalid / expired token state — clear error message
+- [x] "Powered by Studio OS" footer (subtle branding)
+- [x] `usePortal` hook — public fetch by token; no auth required (RLS policy: token match = read access)
+- [x] Schema migration — RLS policy on `clients` for portal read by `share_token` — `supabase/migrations/005_portal_rls.sql`
 
 ---
 
@@ -137,7 +137,7 @@ Items are ordered by build priority. Do not skip ahead — each group unblocks t
 - [x] `useTasks` — task groups + tasks by client, CRUD, drag-drop reorder
 - [x] `useBrainDump` — brain dump cards by client, CRUD
 - [ ] `useTaskDetail` — task + subtasks + notes + files + inspo_items (Phase 2D)
-- [ ] `usePortal` — public fetch by share_token (Phase 2E)
+- [x] `usePortal` — public fetch by share_token (Phase 2E)
 
 ---
 
@@ -233,7 +233,7 @@ Items are ordered by build priority. Do not skip ahead — each group unblocks t
 | `migrations/002_client_branding.sql` | Add `color`, `logo_url` to `clients` | Run in SQL Editor |
 | `migrations/003_fix_rls_recursion.sql` | Drop circular subcontractor policies | Run in SQL Editor |
 | `migrations/004_task_detail.sql` | `task_links` table + RLS policy | Run in SQL Editor |
-| `migrations/005_portal_rls.sql` | RLS policy: public read by `share_token` | Pending |
+| `migrations/005_portal_rls.sql` | RLS policy: public read by `share_token` | Run in SQL Editor |
 | `migrations/006_studio_name.sql` | Add `studio_name` to `profiles` | Pending |
 
 ---
