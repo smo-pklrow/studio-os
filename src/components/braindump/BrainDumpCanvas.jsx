@@ -29,6 +29,15 @@ export default function BrainDumpCanvas({ cards, onCreateCard, onUpdateCard, onD
 
   return (
     <div className="flex flex-wrap gap-4 py-2">
+      {cards.length === 0 && !adding && (
+        <div className="w-full flex flex-col items-center justify-center py-20 text-center animate-fade-in">
+          <p className="text-sm font-medium mb-1" style={{ color: 'var(--color-text)' }}>No brain dump cards yet</p>
+          <p className="text-xs mb-6" style={{ color: 'var(--color-subtle)' }}>
+            Drop thoughts, concepts, and visual ideas here.
+          </p>
+          <button className="btn btn-primary" onClick={() => setAdding(true)}>+ Add card</button>
+        </div>
+      )}
       {cards.map(card => (
         <BrainDumpCard
           key={card.id}

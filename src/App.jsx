@@ -7,6 +7,7 @@ import ClientPortal from './pages/ClientPortal.jsx'
 import Login from './pages/Login.jsx'
 import Settings from './pages/Settings.jsx'
 import NotFound from './pages/NotFound.jsx'
+import ErrorBoundary from './components/shared/ErrorBoundary.jsx'
 
 export default function App() {
   return (
@@ -17,10 +18,10 @@ export default function App() {
 
       {/* Protected routes — wrapped in AppShell (auth guard + nav) */}
       <Route element={<AppShell />}>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/client/:clientId" element={<ClientBoard />} />
-        <Route path="/client/:clientId/task/:taskId" element={<TaskDetail />} />
-        <Route path="/settings" element={<Settings />} />
+        <Route path="/" element={<ErrorBoundary><Dashboard /></ErrorBoundary>} />
+        <Route path="/client/:clientId" element={<ErrorBoundary><ClientBoard /></ErrorBoundary>} />
+        <Route path="/client/:clientId/task/:taskId" element={<ErrorBoundary><TaskDetail /></ErrorBoundary>} />
+        <Route path="/settings" element={<ErrorBoundary><Settings /></ErrorBoundary>} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

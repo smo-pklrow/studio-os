@@ -7,7 +7,7 @@ export default function StatsBar({ stats }) {
   ]
 
   return (
-    <div className="grid grid-cols-4 gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
       {tiles.map(tile => (
         <div key={tile.label} className="card p-4">
           <p className="text-dark-muted text-xs mb-2">{tile.label}</p>

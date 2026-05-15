@@ -35,7 +35,8 @@ export default function WeekCalendar() {
         <span className="text-dark-subtle text-xs">{rangeLabel}</span>
       </div>
 
-      <div className="grid grid-cols-5 gap-3">
+      <div className="overflow-x-auto -mx-6 px-6 sm:mx-0 sm:px-0">
+      <div className="grid grid-cols-5 gap-3" style={{ minWidth: '420px' }}>
         {days.map((day, i) => {
           const isToday = isSameDay(day, today)
           return (
@@ -55,6 +56,7 @@ export default function WeekCalendar() {
             </div>
           )
         })}
+      </div>
       </div>
     </section>
   )

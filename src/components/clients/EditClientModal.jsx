@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 const COLOR_SWATCHES = [
   '#1D9E75', '#378ADD', '#9B59B6', '#E85C4A',
@@ -14,6 +14,12 @@ const HEALTH_OPTIONS = [
 ]
 
 export default function EditClientModal({ client, onClose, onSave }) {
+  useEffect(() => {
+    function handle(e) { if (e.key === 'Escape') onClose() }
+    document.addEventListener('keydown', handle)
+    return () => document.removeEventListener('keydown', handle)
+  }, [onClose])
+
   const [name, setName]               = useState(client.name ?? '')
   const [projectName, setProjectName] = useState(client.project_name ?? '')
   const [color, setColor]             = useState(client.color ?? COLOR_SWATCHES[0])

@@ -67,24 +67,24 @@ Items are ordered by build priority. Do not skip ahead — each group unblocks t
 > Completes the drill-down. Clicking a task title currently leads nowhere.
 
 **Left column (main content)**
-- [ ] Page layout — two-column: left (title, status, description, subtasks, notes, Claude panel), right (sidebar cards)
-- [ ] Breadcrumb — All clients › Client name › Group name › Task title
-- [ ] Task title — large editable heading (click to edit inline)
-- [ ] Status pill + due date + priority — row of chips at top; each clickable
-- [ ] Description — plain textarea, click to edit, saves on blur
-- [ ] Subtasks — add / check-off / delete; stored in `subtasks` table
-- [ ] Notes — timestamped freetext notes stored in `notes` table; "Add note" textarea
-- [ ] Claude panel shell — placeholder card "Claude knows this client · Phase 3" with muted description (wired in Phase 3)
+- [x] Page layout — two-column: left (title, status, description, subtasks, notes, Claude panel), right (sidebar cards)
+- [x] Breadcrumb — All clients › Client name › Group name › Task title
+- [x] Task title — large editable heading (click to edit inline)
+- [x] Status pill + due date + priority — row of chips at top; each clickable
+- [x] Description — plain textarea, click to edit, saves on blur
+- [x] Subtasks — add / check-off / delete; stored in `subtasks` table
+- [x] Notes — timestamped freetext notes stored in `notes` table; "Add note" textarea
+- [x] Claude panel shell — placeholder card "Claude knows this client · Phase 3" with muted description (wired in Phase 3)
 
 **Right sidebar (stacked cards)**
-- [ ] Linked calendar card — Phase 3 shell; shows placeholder "Connect calendar in Phase 3"
-- [ ] Gmail threads card — manually linked email threads; "Link thread" opens a small form (URL + label); stored in `task_links` table; shows thread title + date; delete option
-- [ ] Inspo board card — image / link / note tiles; stored in `inspo_items`; drag to reorder; "drag to reorder" label
-- [ ] Files card — upload to Supabase Storage `task-files` bucket; list filename + size + date; delete
+- [x] Linked calendar card — Phase 3 shell; shows placeholder "Connect calendar in Phase 3"
+- [x] Gmail threads card — manually linked email threads; "Link thread" opens a small form (URL + label); stored in `task_links` table; shows thread title + date; delete option
+- [x] Inspo board card — image / link / note tiles; stored in `inspo_items`; drag to reorder; "drag to reorder" label
+- [x] Files card — upload to Supabase Storage `task-files` bucket; list filename + size + date; delete
 
 **Data + schema**
-- [ ] `useTaskDetail` hook — fetches task + subtasks + notes + files + inspo_items + task_links by task ID
-- [ ] Schema migration — `supabase/migrations/004_task_detail.sql` — add `task_links` table (id, task_id, url, label, created_at); any missing task detail columns
+- [x] `useTaskDetail` hook — fetches task + subtasks + notes + files + inspo_items + task_links by task ID
+- [x] Schema migration — `supabase/migrations/004_task_detail.sql` — add `task_links` table (id, task_id, url, label, created_at); any missing task detail columns
 
 ---
 
@@ -118,15 +118,15 @@ Items are ordered by build priority. Do not skip ahead — each group unblocks t
 
 ---
 
-### 2G — Completeness & Polish `[ONGOING]`
+### 2G — Completeness & Polish `[COMPLETE]`
 
-- [ ] Loading skeletons on Dashboard, ClientBoard, TaskDetail
-- [ ] Error boundaries on each page route
-- [ ] Mobile layout (375px breakpoint) — Dashboard list collapses gracefully
-- [ ] Empty states for every zero-data condition (no groups, no brain dump cards, no tasks)
-- [ ] Keyboard navigation — Escape closes all modals/dropdowns
-- [ ] Week calendar events — custom event model or Phase 4 Google Calendar sync
-- [ ] Pause client visual treatment — muted card style in list
+- [x] Loading skeletons on Dashboard (client rows + stats bar), ClientBoard (task groups)
+- [x] Error boundaries on each protected page route (`ErrorBoundary` wraps Dashboard, ClientBoard, TaskDetail, Settings)
+- [x] Mobile layout — StatsBar 2×2 on mobile, WeekCalendar horizontal scroll on mobile
+- [x] Empty states — brain dump canvas; groups (already existed); task rows (already existed)
+- [x] Keyboard navigation — Escape closes AddClientModal and EditClientModal
+- [ ] Week calendar events — deferred to Phase 3 (Google Calendar MCP)
+- [x] Pause client visual treatment — amber border + opacity on ClientRow (was already built in 2B)
 
 ---
 
@@ -136,7 +136,7 @@ Items are ordered by build priority. Do not skip ahead — each group unblocks t
 - [x] `useClient` — single client by ID
 - [x] `useTasks` — task groups + tasks by client, CRUD, drag-drop reorder
 - [x] `useBrainDump` — brain dump cards by client, CRUD
-- [ ] `useTaskDetail` — task + subtasks + notes + files + inspo_items (Phase 2D)
+- [x] `useTaskDetail` — task + subtasks + notes + files + inspo_items (Phase 2D)
 - [x] `usePortal` — public fetch by share_token (Phase 2E)
 
 ---

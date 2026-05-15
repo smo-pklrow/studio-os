@@ -9,6 +9,33 @@ import BrainDumpCanvas from '../components/braindump/BrainDumpCanvas'
 
 const GROUP_COLORS = ['#378ADD', '#1D9E75', '#E85C4A', '#9B59B6', '#F4A623', '#E91E63', '#00BCD4']
 
+function TaskGroupSkeleton() {
+  return (
+    <div className="mb-8 animate-pulse">
+      <div className="flex items-center gap-2 mb-4">
+        <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: 'var(--color-elevated-hi)' }} />
+        <div className="h-3 rounded w-28" style={{ backgroundColor: 'var(--color-elevated-hi)' }} />
+        <div className="h-2 rounded w-12 ml-1" style={{ backgroundColor: 'var(--color-elevated-hi)' }} />
+      </div>
+      <div className="card overflow-hidden">
+        {[1, 2, 3].map(i => (
+          <div
+            key={i}
+            className="flex items-center gap-4 px-4 py-3"
+            style={{ borderBottom: '1px solid var(--border-subtle)' }}
+          >
+            <div className="w-4 h-4 rounded-full shrink-0" style={{ backgroundColor: 'var(--color-elevated-hi)' }} />
+            <div className="flex-1 h-3 rounded" style={{ backgroundColor: 'var(--color-elevated-hi)' }} />
+            <div className="h-5 rounded w-16" style={{ backgroundColor: 'var(--color-elevated-hi)' }} />
+            <div className="h-2 rounded w-8" style={{ backgroundColor: 'var(--color-elevated-hi)' }} />
+            <div className="h-2 rounded w-14" style={{ backgroundColor: 'var(--color-elevated-hi)' }} />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function getTab(clientId) {
   return localStorage.getItem(`tab-${clientId}`) ?? 'tasks'
 }
@@ -76,7 +103,10 @@ export default function ClientBoard() {
         {tab === 'tasks' && (
           <div>
             {loading && (
-              <p className="text-dark-muted text-sm">Loading…</p>
+              <div>
+                <TaskGroupSkeleton />
+                <TaskGroupSkeleton />
+              </div>
             )}
 
             {!loading && groups.length === 0 && (

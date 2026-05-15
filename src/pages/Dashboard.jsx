@@ -7,6 +7,37 @@ import WeekCalendar from '../components/layout/WeekCalendar'
 import DigestStrip from '../components/layout/DigestStrip'
 import StatsBar from '../components/layout/StatsBar'
 
+function ClientRowSkeleton() {
+  return (
+    <div className="card p-5 flex items-center gap-4 animate-pulse">
+      <div className="w-10 h-10 rounded-lg shrink-0" style={{ backgroundColor: 'var(--color-elevated-hi)' }} />
+      <div className="flex-1 flex flex-col gap-2.5">
+        <div className="h-3 rounded w-32" style={{ backgroundColor: 'var(--color-elevated-hi)' }} />
+        <div className="h-2 rounded w-48" style={{ backgroundColor: 'var(--color-elevated-hi)' }} />
+        <div className="h-1.5 rounded w-full mt-0.5" style={{ backgroundColor: 'var(--color-elevated-hi)' }} />
+        <div className="h-2 rounded w-20" style={{ backgroundColor: 'var(--color-elevated-hi)' }} />
+      </div>
+      <div className="shrink-0 flex flex-col items-end gap-2">
+        <div className="h-5 rounded w-16" style={{ backgroundColor: 'var(--color-elevated-hi)' }} />
+        <div className="h-2 rounded w-10" style={{ backgroundColor: 'var(--color-elevated-hi)' }} />
+      </div>
+    </div>
+  )
+}
+
+function StatsBarSkeleton() {
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 animate-pulse">
+      {[1, 2, 3, 4].map(i => (
+        <div key={i} className="card p-4">
+          <div className="h-2 rounded w-20 mb-3" style={{ backgroundColor: 'var(--color-elevated-hi)' }} />
+          <div className="h-8 rounded w-10" style={{ backgroundColor: 'var(--color-elevated-hi)' }} />
+        </div>
+      ))}
+    </div>
+  )
+}
+
 const HEALTH_LABELS = {
   on_track:        'On track',
   needs_attention: 'Needs attention',
@@ -64,7 +95,7 @@ export default function Dashboard() {
         <WeekCalendar />
         <DigestStrip />
 
-        {!loading && !error && <StatsBar stats={globalStats} />}
+        {loading ? <StatsBarSkeleton /> : !error && <StatsBar stats={globalStats} />}
 
         {/* Client list */}
         <section>
@@ -103,7 +134,11 @@ export default function Dashboard() {
             </div>
           )}
 
-          {loading && <p className="text-dark-muted text-sm">Loading…</p>}
+          {loading && (
+            <div className="flex flex-col gap-3">
+              {[1, 2, 3].map(i => <ClientRowSkeleton key={i} />)}
+            </div>
+          )}
 
           {error && <p className="text-red-400 text-sm">Failed to load clients.</p>}
 

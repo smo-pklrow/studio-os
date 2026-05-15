@@ -4,7 +4,7 @@
 
 ---
 
-## Stream A — Data Layer (Supabase) `[MOSTLY DONE]`
+## Stream A — Data Layer (Supabase) `[PHASE 2 COMPLETE]`
 
 **Scope**: Schema, migrations, RLS policies, hooks, Edge Functions
 **Files**: `supabase/`, `src/lib/`, `src/hooks/`
@@ -14,17 +14,18 @@
 - [x] Schema + RLS policies (`supabase/schema.sql`)
 - [x] Migration 002: client branding columns
 - [x] Migration 003: fix RLS recursion
+- [x] Migration 004: `task_links` table + RLS
+- [x] Migration 005: portal RLS (public read via share_token)
+- [x] Migration 006: `studio_name` on profiles
 - [x] `useClients` — fetch all with embedded task stats, full CRUD
 - [x] `useClient` — single client fetch + update
 - [x] `useTasks` — task groups + tasks CRUD + drag-drop reorder
 - [x] `useBrainDump` — brain dump cards CRUD
+- [x] `useTaskDetail` — task + subtasks + notes + files + inspo_items + task_links
+- [x] `usePortal` — public read by share_token (no auth)
+- [x] `useProfile` — fetch + update profiles row for current user
 
-### Remaining
-- [ ] `useTaskDetail` — task + subtasks + notes + files + inspo_items
-- [ ] `usePortal` — public read by share_token (no auth)
-- [ ] Migration 004: any missing task detail columns
-- [ ] Migration 005: portal RLS policy (public read via share_token)
-- [ ] Migration 006: `studio_name` on profiles
+### Remaining (Phase 3)
 - [ ] Edge Functions: `/weekly-digest`, `/generate-brief`, `/auto-tag` (Phase 3)
 
 ### Rules
@@ -34,18 +35,18 @@
 
 ---
 
-## Stream B — Navigation & App Shell `[NOT STARTED — PRIORITY]`
+## Stream B — Navigation & App Shell `[COMPLETE]`
 
 **Scope**: Persistent nav, user menu, logout, 404
 **Files**: `src/components/layout/AppShell.jsx`, `src/components/layout/NavBar.jsx`
 **Dependencies**: None
 
-### Tasks
-- [ ] `NavBar.jsx` — persistent top bar: Studio OS logo, Dashboard link, Settings link, user avatar
-- [ ] User avatar dropdown — display name, Sign out (`supabase.auth.signOut()`)
-- [ ] Sign out flow — clears session, redirects to `/login`
-- [ ] 404 page — friendly not-found with back link
-- [ ] `AppShell.jsx` update — include NavBar above `<Outlet />`
+### Done
+- [x] `NavBar.jsx` — persistent top bar: logo, studio name (or "Studio OS"), Settings link, user avatar
+- [x] User avatar dropdown — display name, email, Settings link, Sign out
+- [x] Sign out flow — clears localStorage tab-persistence keys, redirects to `/login`
+- [x] 404 page — friendly not-found with back link
+- [x] `AppShell.jsx` — auth guard + NavBar + Outlet; fetches studio_name for nav display
 
 ### Rules
 - NavBar must not re-render on route changes — lift user state to AppShell
@@ -53,21 +54,21 @@
 
 ---
 
-## Stream C — Settings & Admin `[NOT STARTED]`
+## Stream C — Settings & Admin `[COMPLETE]`
 
 **Scope**: Settings page, profile, studio name, theme, danger zone
 **Files**: `src/pages/Settings.jsx`, `src/hooks/useProfile.js`
 **Dependencies**: Stream B (nav links to settings)
 
-### Tasks
-- [ ] `useProfile.js` — fetch + update `profiles` row for current user
-- [ ] `Settings.jsx` — route `/settings`
-- [ ] Profile section — Google avatar + display name (read-only from OAuth)
-- [ ] Studio name field — editable, stored in `profiles.studio_name`
-- [ ] Theme toggle — dark/light (dark-only for now, light deferred)
-- [ ] Notification preferences — digest schedule (placeholder; wired in Phase 3)
-- [ ] Danger zone — Sign out button, Delete account with confirmation modal
-- [ ] Migration 006: `ALTER TABLE profiles ADD COLUMN studio_name text`
+### Done
+- [x] `useProfile.js` — fetch + update `profiles` row for current user
+- [x] `Settings.jsx` — route `/settings`
+- [x] Profile section — Google avatar + display name (read-only from OAuth)
+- [x] Studio name field — editable, stored in `profiles.studio_name`; shown in nav bar
+- [x] Theme toggle — dark active, light disabled ("coming soon")
+- [x] Notification preferences — digest schedule placeholder (Phase 3 badge, disabled selects)
+- [x] Danger zone — Sign out button + Delete account with inline confirmation
+- [x] Migration 006: `ALTER TABLE profiles ADD COLUMN studio_name text`
 
 ---
 
@@ -93,7 +94,7 @@
 
 ---
 
-## Stream E — Client Board (Level 2) Gaps `[IN PROGRESS]`
+## Stream E — Client Board (Level 2) Gaps `[COMPLETE]`
 
 **Scope**: Task editing gaps, group management, client health editor
 **Files**: `src/pages/ClientBoard.jsx`, `src/components/tasks/`
@@ -106,62 +107,61 @@
 - [x] New group flow
 - [x] Brain dump canvas + cards
 - [x] Tab persistence
-
-### Remaining
-- [ ] Due date picker on TaskRow (inline date input)
-- [ ] Task title inline edit (double-click to edit)
-- [ ] Group rename (double-click group name)
-- [ ] Group color picker (click group dot)
-- [ ] Group delete (with confirmation)
-- [ ] Health editor in ClientHeader (click badge → dropdown)
-- [ ] Priority selector on TaskRow (click badge → cycle)
+- [x] Due date picker on TaskRow (inline date input)
+- [x] Task title inline edit (double-click to edit; 280ms timer disambiguates vs navigate)
+- [x] Group rename (double-click group name)
+- [x] Group color picker (click group dot → swatch popover)
+- [x] Group delete (inline confirmation in header)
+- [x] Health editor in ClientHeader (click badge → dropdown)
+- [x] Priority selector on TaskRow (click badge → cycles normal → high → low)
 
 ---
 
-## Stream F — Task Detail (Level 3) `[NOT STARTED]`
+## Stream F — Task Detail (Level 3) `[COMPLETE]`
 
 **Scope**: Full task detail page — the deepest drill-down level
 **Files**: `src/pages/TaskDetail.jsx`, `src/hooks/useTaskDetail.js`, `src/components/tasks/`
 **Dependencies**: Streams A, D, E
 
-### Tasks
+### Done
 
 **Left column**
-- [ ] `useTaskDetail.js` — fetch task + subtasks + notes + files + inspo_items + task_links
-- [ ] Two-column layout — left: content, right: sidebar cards
-- [ ] Breadcrumb — All clients › Client › Group › Task
-- [ ] Editable task title (large heading, click to edit)
-- [ ] Status pill + due date + priority chips in header row — each clickable
-- [ ] Description textarea (click to edit, saves on blur)
-- [ ] Subtasks — add / check / delete; stored in `subtasks` table
-- [ ] Notes — timestamped freetext; stored in `notes` table; "Add note" textarea
-- [ ] Claude panel shell — placeholder card "Claude knows this client · Phase 3"
+- [x] `useTaskDetail.js` — fetch task + subtasks + notes + files + inspo_items + task_links (parallel Promise.all)
+- [x] Two-column layout — left: content, right: 272px sidebar
+- [x] Breadcrumb — All clients › Client › Group › Task
+- [x] Editable task title (large heading, click to edit)
+- [x] Status pill + due date + priority chips in header row — each clickable
+- [x] Description textarea (click to edit, saves on blur)
+- [x] Subtasks — add / check / delete; stored in `subtasks` table
+- [x] Notes — timestamped freetext; stored in `notes` table; Enter to save
+- [x] Claude panel shell — placeholder card with Phase 3 badge
 
 **Right sidebar cards**
-- [ ] Linked calendar card — Phase 3 shell; static placeholder until Calendar MCP wired
-- [ ] Gmail threads card — manually linked; "Link thread" form (URL + label); stored in `task_links`
-- [ ] Inspo board card — image / link / note tiles; stored in `inspo_items`; drag to reorder
-- [ ] Files card — upload to `task-files` bucket; list filename + size + date; delete
+- [x] Linked calendar card — Phase 3 shell with dashed border placeholder
+- [x] Gmail threads card — "Link thread" form (URL + label); stored in `task_links`; delete option
+- [x] Inspo board card — note / link / image tiles; stored in `inspo_items`; @dnd-kit drag to reorder; 2-col grid
+- [x] Files card — upload to `task-files` bucket; ext badge + size + date; signed URL download; delete
 
 **Schema**
-- [ ] Migration 004: `task_links` table (id, task_id, url, label, created_at); any missing task detail columns
+- [x] Migration 004: `task_links` table (id, task_id, url, label, created_at) + RLS policy
 
 ---
 
-## Stream G — Client Portal `[NOT STARTED]`
+## Stream G — Client Portal `[COMPLETE]`
 
 **Scope**: Public read-only client-facing view — the trust-builder
 **Files**: `src/pages/ClientPortal.jsx`, `src/hooks/usePortal.js`
 **Dependencies**: Stream A (migration 005 + usePortal hook)
 
-### Tasks
-- [ ] Migration 005: RLS policy — public SELECT on `clients` where `share_token` matches
-- [ ] `usePortal.js` — public fetch (no auth); joins task_groups + tasks
-- [ ] Portal page layout — studio name header, client name + project, progress bar
-- [ ] Task groups — read-only, collapsible, status counts
-- [ ] Task rows — title, status badge, due date; no edit controls
-- [ ] Invalid token state — clear error message
-- [ ] "Powered by Studio OS" footer
+### Done
+- [x] Migration 005: RLS policy — anon SELECT on `clients`, `task_groups`, `tasks` where `share_token` not null
+- [x] `usePortal.js` — public fetch (no auth); joins task_groups + tasks; sorted in JS
+- [x] Portal page layout — "Studio OS" header + "Client View" label, client hero card with logo/avatar + health badge + progress bar
+- [x] Task groups — read-only, collapsible (chevron toggle), status count badges
+- [x] Task rows — visual checkbox, title (strikethrough if done), status badge, due date
+- [x] Empty state — "No tasks to show yet"
+- [x] Invalid token state — "Link not found or expired"
+- [x] "Powered by Studio OS" footer
 
 ---
 
