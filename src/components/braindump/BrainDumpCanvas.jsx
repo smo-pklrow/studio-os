@@ -3,6 +3,7 @@ import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Placeholder from '@tiptap/extension-placeholder'
 import BrainDumpCard from './BrainDumpCard'
+import { useToast } from '../shared/Toast'
 
 const COLORS = {
   amber:  { bg: '#231800', fg: '#FAC775', border: '#3D2E00', accent: '#F4A623' },
@@ -179,6 +180,7 @@ export default function BrainDumpCanvas({ cards, onCreateCard, onCreateImageCard
   const [addMode, setAddMode] = useState(null) // null | 'text'
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef(null)
+  const toast = useToast()
 
   // Clipboard paste: detect image and upload
   useEffect(() => {
@@ -192,20 +194,26 @@ export default function BrainDumpCanvas({ cards, onCreateCard, onCreateImageCard
       const file = imageItem.getAsFile()
       if (!file) return
       setUploading(true)
-      await onCreateImageCard(file, 'amber')
+      const result = await onCreateImageCard(file, 'amber')
       setUploading(false)
+      if (result?.error) {
+        toast('Image upload failed — make sure the brain-dump-images bucket exists and is set to Public in Supabase Storage', 'error')
+      }
     }
     document.addEventListener('paste', handlePaste)
     return () => document.removeEventListener('paste', handlePaste)
-  }, [onCreateImageCard])
+  }, [onCreateImageCard, toast])
 
   async function handleFileSelected(e) {
     const file = e.target.files?.[0]
     if (!file) return
     e.target.value = ''
     setUploading(true)
-    await onCreateImageCard(file, 'amber')
+    const result = await onCreateImageCard(file, 'amber')
     setUploading(false)
+    if (result?.error) {
+      toast('Image upload failed — make sure the brain-dump-images bucket exists and is set to Public in Supabase Storage', 'error')
+    }
   }
 
   async function handleAddText(html, color) {

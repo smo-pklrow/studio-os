@@ -211,14 +211,18 @@ export default function TaskRow({ task, onUpdate, onDelete }) {
             onPointerDown={e => e.stopPropagation()}
           />
         ) : (
-          <span
-            className={`tooltip text-sm truncate select-none ${isDone ? 'task-title-done' : 'text-dark-text hover:underline cursor-pointer'}`}
-            data-tip="Click to open · Double-click to rename"
-            onClick={handleTitleClick}
-            onDoubleClick={handleTitleDoubleClick}
-          >
-            {task.title}
-          </span>
+          // Wrapper div carries task-title-done (position:relative + ::after strikethrough).
+          // The inner span has overflow:hidden (truncate) which would clip an ::after on itself.
+          <div className={`relative flex-1 min-w-0 ${isDone ? 'task-title-done' : ''}`}>
+            <span
+              className={`tooltip text-sm truncate select-none block ${isDone ? 'cursor-pointer' : 'text-dark-text hover:underline cursor-pointer'}`}
+              data-tip="Click to open · Double-click to rename"
+              onClick={handleTitleClick}
+              onDoubleClick={handleTitleDoubleClick}
+            >
+              {task.title}
+            </span>
+          </div>
         )}
       </div>
 
@@ -238,8 +242,14 @@ export default function TaskRow({ task, onUpdate, onDelete }) {
             </div>
           ) : (
             <div
-              className="w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-60 transition-opacity"
-              style={{ border: '1.5px dashed var(--border-strong)', color: 'var(--color-subtle)' }}
+              className="w-6 h-6 rounded-full flex items-center justify-center transition-opacity"
+              style={{
+                border: '1.5px dashed var(--border-strong)',
+                color: 'var(--color-subtle)',
+                opacity: 0.22,
+              }}
+              onMouseEnter={e => e.currentTarget.style.opacity = '0.7'}
+              onMouseLeave={e => e.currentTarget.style.opacity = '0.22'}
             >
               <i className="ti ti-user-plus" style={{ fontSize: '10px' }} />
             </div>

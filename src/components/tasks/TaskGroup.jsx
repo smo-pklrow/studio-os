@@ -16,7 +16,7 @@ import {
 import TaskRow from './TaskRow'
 import AddTaskRow from './AddTaskRow'
 
-const COL_HEADERS = ['Task', '', 'Status', 'Due', 'Priority', '']
+const COL_HEADERS = ['Task', 'Assign', 'Status', 'Due', 'Priority', '']
 
 const GROUP_COLORS = [
   '#378ADD', '#1D9E75', '#E85C4A', '#9B59B6',
