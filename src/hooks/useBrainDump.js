@@ -20,14 +20,28 @@ export function useBrainDump(clientId) {
       })
   }, [clientId])
 
-  async function createCard(content, color = 'amber') {
+  async function createCard(content, color = 'amber', type = 'sticky') {
     const { data, error } = await supabase
       .from('brain_dump_cards')
-      .insert({ client_id: clientId, content, color, type: 'sticky' })
+      .insert({ client_id: clientId, content, color, type })
       .select()
       .single()
     if (!error) setCards(prev => [...prev, data])
     return { data, error }
+  }
+
+  // Requires brain-dump-images bucket to be set as Public in Supabase Storage dashboard
+  async function createImageCard(file, color = 'amber') {
+    const ext = (file.name?.split('.').pop() ?? 'png').toLowerCase().replace(/[^a-z0-9]/g, '') || 'png'
+    const path = `${clientId}/${crypto.randomUUID()}.${ext}`
+    const { error: uploadError } = await supabase.storage
+      .from('brain-dump-images')
+      .upload(path, file, { contentType: file.type })
+    if (uploadError) return { error: uploadError }
+    const { data: { publicUrl } } = supabase.storage
+      .from('brain-dump-images')
+      .getPublicUrl(path)
+    return createCard(publicUrl, color, 'image')
   }
 
   async function updateCard(cardId, fields) {
@@ -47,5 +61,5 @@ export function useBrainDump(clientId) {
     return { error }
   }
 
-  return { cards, loading, error, createCard, updateCard, deleteCard }
+  return { cards, loading, error, createCard, createImageCard, updateCard, deleteCard }
 }

@@ -84,7 +84,7 @@ export default function ClientBoard() {
 
   const { client, updateClient } = useClient(clientId)
   const { groups, loading, createGroup, createTask, updateTask, deleteTask, reorderTasks, updateGroup, deleteGroup, reorderGroups } = useTasks(clientId)
-  const { cards, createCard, updateCard, deleteCard } = useBrainDump(clientId)
+  const { cards, createCard, createImageCard, updateCard, deleteCard } = useBrainDump(clientId)
 
   const groupSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -280,9 +280,9 @@ export default function ClientBoard() {
                 </p>
                 <div className="flex flex-wrap items-center gap-4 mt-2.5">
                   {[
-                    { icon: 'ti-click', label: 'Click card to edit' },
-                    { icon: 'ti-palette', label: 'Hover to recolor' },
-                    { icon: 'ti-keyboard', label: '⌘↵ to save' },
+                    { icon: 'ti-text-size', label: 'Rich text — bold, italic, lists' },
+                    { icon: 'ti-photo', label: 'Add images or paste screenshots (⌘V)' },
+                    { icon: 'ti-palette', label: 'Hover card to recolor or delete' },
                   ].map(({ icon, label }) => (
                     <span key={label} className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--color-subtle)' }}>
                       <i className={`ti ${icon}`} style={{ fontSize: '11px' }} />
@@ -296,6 +296,7 @@ export default function ClientBoard() {
             <BrainDumpCanvas
               cards={cards}
               onCreateCard={createCard}
+              onCreateImageCard={createImageCard}
               onUpdateCard={updateCard}
               onDeleteCard={deleteCard}
             />

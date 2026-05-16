@@ -465,3 +465,71 @@ html.lenis body {
     }
   }
 }
+
+/* =============================================================
+   Brain dump — Tiptap rich text
+   ============================================================= */
+
+/* Editor element (contenteditable) */
+.brain-dump-editor {
+  outline: none;
+  font-size: 13px;
+  line-height: 1.6;
+  min-height: 80px;
+}
+
+/* Placeholder via Tiptap Placeholder extension */
+.brain-dump-editor p.is-empty::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: currentColor;
+  opacity: 0.28;
+  pointer-events: none;
+  height: 0;
+}
+
+/* Shared prose styles for editor and read-only HTML display */
+.brain-dump-content,
+.brain-dump-editor {
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.brain-dump-content p,
+.brain-dump-editor p {
+  margin: 0 0 0.3em;
+}
+
+.brain-dump-content p:last-child,
+.brain-dump-editor p:last-child {
+  margin-bottom: 0;
+}
+
+.brain-dump-content ul,
+.brain-dump-editor ul {
+  list-style: disc;
+  padding-left: 1.25em;
+  margin: 0.2em 0;
+}
+
+.brain-dump-content ol,
+.brain-dump-editor ol {
+  list-style: decimal;
+  padding-left: 1.25em;
+  margin: 0.2em 0;
+}
+
+.brain-dump-content li,
+.brain-dump-editor li {
+  margin: 0.1em 0;
+}
+
+.brain-dump-content strong,
+.brain-dump-editor strong {
+  font-weight: 600;
+}
+
+.brain-dump-content em,
+.brain-dump-editor em {
+  font-style: italic;
+}
