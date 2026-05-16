@@ -126,5 +126,39 @@ export function useClients() {
     return { data, error }
   }
 
-  return { clients, loading, error, globalStats, createClient, archiveClient, updateClient, pauseClient }
+  async function cloneClientStructure(sourceClientId, targetClientId) {
+    const { data: sourceGroups, error: fetchError } = await supabase
+      .from('task_groups')
+      .select('id, name, color, sort_order, tasks(id, title, priority, sort_order)')
+      .eq('client_id', sourceClientId)
+      .order('sort_order')
+    if (fetchError || !sourceGroups?.length) return { error: fetchError }
+
+    for (const group of sourceGroups) {
+      const { data: newGroup, error: groupError } = await supabase
+        .from('task_groups')
+        .insert({ client_id: targetClientId, name: group.name, color: group.color, sort_order: group.sort_order })
+        .select('id')
+        .single()
+      if (groupError || !newGroup) continue
+
+      const tasks = (group.tasks ?? [])
+      if (tasks.length) {
+        await supabase.from('tasks').insert(
+          tasks.map(t => ({
+            group_id: newGroup.id,
+            title: t.title,
+            priority: t.priority ?? 'normal',
+            sort_order: t.sort_order,
+            status: 'todo',
+            due_date: null,
+            assigned_to: null,
+          }))
+        )
+      }
+    }
+    return { error: null }
+  }
+
+  return { clients, loading, error, globalStats, createClient, archiveClient, updateClient, pauseClient, cloneClientStructure }
 }

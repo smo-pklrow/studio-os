@@ -72,7 +72,7 @@ function getInsight(clients) {
 }
 
 export default function Dashboard() {
-  const { clients, loading, error, globalStats, createClient, archiveClient, updateClient, pauseClient } = useClients()
+  const { clients, loading, error, globalStats, createClient, archiveClient, updateClient, pauseClient, cloneClientStructure } = useClients()
   const toast = useToast()
   const [showAddModal, setShowAddModal]   = useState(false)
   const [editingClient, setEditingClient] = useState(null)
@@ -102,6 +102,15 @@ export default function Dashboard() {
     document.addEventListener('keydown', handle)
     return () => document.removeEventListener('keydown', handle)
   }, [])
+
+  async function handleAddClient(fields, logoFile, sourceClientId) {
+    const result = await createClient(fields, logoFile)
+    if (!result.error && sourceClientId && result.data?.id) {
+      const { error: cloneError } = await cloneClientStructure(sourceClientId, result.data.id)
+      if (cloneError) toast('Structure copy failed — client created but tasks were not copied.', 'error')
+    }
+    return result
+  }
 
   function dismissNudge() {
     localStorage.setItem('portal-nudge-dismissed', 'true')
@@ -292,7 +301,8 @@ export default function Dashboard() {
       {showAddModal && (
         <AddClientModal
           onClose={() => setShowAddModal(false)}
-          onAdd={createClient}
+          onAdd={handleAddClient}
+          clients={clients}
         />
       )}
 

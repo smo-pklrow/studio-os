@@ -13,23 +13,24 @@ const HEALTH_OPTIONS = [
   { value: 'nearly_done',     label: 'Nearly done',     badge: 'badge-blue'  },
 ]
 
-export default function AddClientModal({ onClose, onAdd }) {
+export default function AddClientModal({ onClose, onAdd, clients = [] }) {
   useEffect(() => {
     function handle(e) { if (e.key === 'Escape') onClose() }
     document.addEventListener('keydown', handle)
     return () => document.removeEventListener('keydown', handle)
   }, [onClose])
 
-  const [name, setName] = useState('')
+  const [name, setName]               = useState('')
   const [projectName, setProjectName] = useState('')
-  const [color, setColor] = useState(COLOR_SWATCHES[0])
-  const [health, setHealth] = useState('on_track')
-  const [startDate, setStartDate] = useState('')
-  const [dueDate, setDueDate] = useState('')
-  const [logoFile, setLogoFile] = useState(null)
+  const [color, setColor]             = useState(COLOR_SWATCHES[0])
+  const [health, setHealth]           = useState('on_track')
+  const [startDate, setStartDate]     = useState('')
+  const [dueDate, setDueDate]         = useState('')
+  const [logoFile, setLogoFile]       = useState(null)
   const [logoPreview, setLogoPreview] = useState(null)
-  const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState(null)
+  const [sourceClientId, setSourceClientId] = useState('')
+  const [submitting, setSubmitting]   = useState(false)
+  const [error, setError]             = useState(null)
   const fileInputRef = useRef(null)
 
   function handleLogoChange(e) {
@@ -58,7 +59,8 @@ export default function AddClientModal({ onClose, onAdd }) {
         start_date: startDate || null,
         due_date: dueDate || null,
       },
-      logoFile
+      logoFile,
+      sourceClientId || null
     )
     setSubmitting(false)
     if (error) setError(error.message)
@@ -172,11 +174,7 @@ export default function AddClientModal({ onClose, onAdd }) {
                   alt="Logo preview"
                   className="w-12 h-12 rounded-lg object-cover border border-dark-border"
                 />
-                <button
-                  type="button"
-                  className="btn text-xs"
-                  onClick={handleRemoveLogo}
-                >
+                <button type="button" className="btn text-xs" onClick={handleRemoveLogo}>
                   Remove
                 </button>
               </div>
@@ -198,9 +196,31 @@ export default function AddClientModal({ onClose, onAdd }) {
             />
           </div>
 
-          {error && (
-            <p className="text-red-400 text-xs">{error}</p>
+          {/* Copy structure from existing client */}
+          {clients.length > 0 && (
+            <div>
+              <label className="block text-dark-muted text-xs mb-1.5">Copy task structure from</label>
+              <select
+                className="w-full bg-dark-elevated border border-dark-border rounded-lg px-3 py-2 text-sm text-dark-text focus:outline-none focus:border-brand-green transition-colors"
+                value={sourceClientId}
+                onChange={e => setSourceClientId(e.target.value)}
+              >
+                <option value="">— Start fresh —</option>
+                {clients.map(c => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}{c.project_name ? ` — ${c.project_name}` : ''}
+                  </option>
+                ))}
+              </select>
+              {sourceClientId && (
+                <p className="text-xs mt-1.5 leading-relaxed" style={{ color: 'var(--color-subtle)' }}>
+                  Task groups and task names will be copied. Status, due dates, and assignees start fresh.
+                </p>
+              )}
+            </div>
           )}
+
+          {error && <p className="text-red-400 text-xs">{error}</p>}
 
           <div className="flex gap-2 justify-end pt-1">
             <button type="button" className="btn" onClick={onClose}>

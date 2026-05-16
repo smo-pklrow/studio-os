@@ -2,8 +2,8 @@
 
 > Update this file after every session. Mark tasks `[x]` when complete. Add blockers inline.
 
-**Current phase**: Phase 2 — Core UX Completion (2F done → 2G next)
-**Last updated**: 2026-05-15
+**Current phase**: Phase 2 — Core UX Completion (2J complete → Phase 3 next)
+**Last updated**: 2026-05-16
 
 ---
 
@@ -154,12 +154,65 @@ Items are ordered by build priority. Do not skip ahead — each group unblocks t
 
 ---
 
+### 2H — Brain Dump Enhancement `[COMPLETE]`
+
+> Upgraded brain dump from simple sticky notes to a rich Miro-like capture surface.
+
+- [x] **Tiptap rich text editor** — per-card editing with bold, italic, bullet list toolbar; lazy mount (Tiptap only activates on card click; view mode uses `dangerouslySetInnerHTML`)
+- [x] **Image card type** — `type` column distinguishes `sticky` vs `image`; image cards render `<img>` with error state
+- [x] **Local file upload** — "Image" button → file picker → uploads to Supabase `brain-dump-images` bucket → stores `publicUrl` as card content
+- [x] **Clipboard paste (⌘V)** — global `document.paste` listener; detects image MIME type; skips intercept when focus is in contentEditable/input/textarea; shows uploading skeleton during async upload
+- [x] **Error toasts on upload failure** — `useToast` on `BrainDumpCanvas`; message includes bucket setup instructions
+- [x] **Responsive card grid** — `repeat(auto-fill, minmax(240px, 1fr))` CSS grid; 1–4 columns depending on viewport
+- [x] **Action bar** — "Text note" + "Image" buttons + "⌘V to paste a screenshot" hint
+- [x] **Uploading skeleton** — animated placeholder card while image uploads
+- [x] **Color picker per card** — 5-color swatch (amber/green/blue/pink/purple) with distinct dark background per theme
+- [x] **Tiptap CSS** — placeholder, list, strong, em styles appended to `src/styles/index.css`
+- [x] `useBrainDump` updated — `createCard` accepts `type` param; `createImageCard` handles storage upload + card insert; both returned from hook
+
+**Manual Supabase step required**: Create `brain-dump-images` bucket in Supabase Storage and set it to **Public**.
+
+---
+
+### 2I — UX Fixes `[COMPLETE]`
+
+- [x] **Task strikethrough rendering** — `task-title-done::after` was clipped by `overflow: hidden` on the same element. Fix: moved `task-title-done` class to a wrapper `<div>` (no overflow); inner `<span>` keeps `truncate` for text overflow. Now renders correctly.
+- [x] **Assignee column header** — `COL_HEADERS` in `TaskGroup.jsx` had empty string for assignee column; changed to `'Assign'`
+- [x] **Assignee avatar always visible** — unassigned avatar was `opacity-0 group-hover:opacity-60` (invisible at rest). Changed to always-visible at 22% opacity, hover brightens to 70% via inline `onMouseEnter/Leave`
+
+---
+
+### 2J — Clone Client Structure `[COMPLETE]`
+
+> Deliberate alternative to a template admin system. See Architecture Decision below.
+
+- [x] **`cloneClientStructure(sourceClientId, targetClientId)`** in `useClients.js` — fetches source task groups + tasks; inserts new groups for target client; batch-inserts tasks with `status: 'todo'`, `due_date: null`, `assigned_to: null`
+- [x] **"Copy task structure from" dropdown** in `AddClientModal` — only shown when `clients.length > 0`; "— Start fresh —" default; lists all existing clients with `name — project_name`; hint text when a source is selected
+- [x] **`handleAddClient` in `Dashboard.jsx`** — wraps `createClient` + `cloneClientStructure`; shows error toast if clone step fails but client was created; passes `clients` prop and `handleAddClient` to `AddClientModal`
+
+---
+
+### Architecture Decision Log
+
+**No template admin system / No project-type presets** (decided 2026-05-16)
+
+Templates were considered for pre-populating task groups for recurring client types (e.g., brand refresh, website build). Rejected because:
+1. Templates go stale — the moment they're saved they start drifting from how work actually runs
+2. Templates require admin UI to build and maintain (another surface to design, build, and explain)
+3. Phase 3 makes templates obsolete — AI will generate a project plan from a brief in Phase 3 (see 3I below), which is both smarter and more customized than any static template
+
+**Current approach**: Clone task structure from an existing client (2J). Good enough for Phase 2 without the maintenance burden.
+
+**Phase 3 approach**: AI-generated project plan from brief (3I). Brief → Claude → structured groups + tasks. Smarter, adapts to each engagement.
+
+---
+
 ### Hooks — all done ✓
 
-- [x] `useClients` — fetch all (enriched with task stats), create, archive, update
+- [x] `useClients` — fetch all (enriched with task stats), create, archive, update, pause, cloneClientStructure
 - [x] `useClient` — single client by ID
 - [x] `useTasks` — task groups + tasks by client, CRUD, drag-drop reorder
-- [x] `useBrainDump` — brain dump cards by client, CRUD
+- [x] `useBrainDump` — brain dump cards by client, CRUD (sticky + image types)
 - [x] `useTaskDetail` — task + subtasks + notes + files + inspo_items (Phase 2D)
 - [x] `usePortal` — public fetch by share_token (Phase 2E)
 
@@ -237,6 +290,19 @@ Items are ordered by build priority. Do not skip ahead — each group unblocks t
 
 - [ ] Notification preferences wired — connect Settings digest time to automated run schedule
 - [ ] Email delivery for weekly digest (Supabase edge function or Resend)
+
+---
+
+### 3I — AI-Generated Project Plan from Brief
+
+> Replaces templates and presets entirely. Smarter and always fresh.
+
+- [ ] "Generate project plan" button in AddClientModal (or ClientBoard empty state)
+- [ ] Studio owner writes a plain-English brief: "Brand identity for a wellness startup, 3-month engagement, deliverables: logo, guidelines, website"
+- [ ] Edge Function calls Claude with the brief → returns structured task groups + task names
+- [ ] Groups + tasks inserted into the new client automatically (same structure as `cloneClientStructure`)
+- [ ] Studio owner reviews and adjusts before proceeding
+- [ ] Claude Managed Agent memory: plan becomes the initial context for the client's agent in 3A
 
 ---
 
