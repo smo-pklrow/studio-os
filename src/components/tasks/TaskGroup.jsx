@@ -16,7 +16,7 @@ import {
 import TaskRow from './TaskRow'
 import AddTaskRow from './AddTaskRow'
 
-const COL_HEADERS = ['Task', 'Status', 'Due', 'Priority', '']
+const COL_HEADERS = ['Task', '', 'Status', 'Due', 'Priority', '']
 
 const GROUP_COLORS = [
   '#378ADD', '#1D9E75', '#E85C4A', '#9B59B6',
@@ -210,11 +210,11 @@ export default function TaskGroup({
           {/* Column headers */}
           <div
             className="grid items-center gap-3 px-1 pb-1"
-            style={{ gridTemplateColumns: '16px 1fr 120px 72px 72px 28px' }}
+            style={{ gridTemplateColumns: '16px 1fr 40px 120px 72px 72px 28px' }}
           >
             <span />
             {COL_HEADERS.map((h, i) => (
-              <span key={i} className="text-dark-subtle text-xs">{h}</span>
+              <span key={i} className="text-dark-subtle text-xs text-center">{h}</span>
             ))}
           </div>
 

@@ -259,6 +259,7 @@ Items are ordered by build priority. Do not skip ahead — each group unblocks t
 | `migrations/004_task_detail.sql` | `task_links` table + RLS policy | Run in SQL Editor |
 | `migrations/005_portal_rls.sql` | RLS policy: public read by `share_token` | Run in SQL Editor |
 | `migrations/006_studio_name.sql` | Add `studio_name` to `profiles` | Run in SQL Editor |
+| `migrations/007_task_assignee.sql` | Add `assigned_to text` to `tasks` | **Run in SQL Editor** |
 
 ---
 

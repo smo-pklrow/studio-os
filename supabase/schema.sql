@@ -60,6 +60,7 @@ create table public.tasks (
   priority          text not null default 'normal'
                          check (priority in ('low', 'normal', 'high')),
   due_date          date,
+  assigned_to       text,
   calendar_event_id text,
   sort_order        int  not null default 0,
   created_at        timestamptz not null default now(),

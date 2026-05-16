@@ -18,6 +18,25 @@ const PRIORITY_STYLE = {
 
 const PRIORITY_CYCLE = { normal: 'high', high: 'low', low: 'normal' }
 
+// Deterministic color per name so each person always gets the same avatar color
+const AVATAR_COLORS = ['#378ADD', '#1D9E75', '#E85C4A', '#9B59B6', '#F4A623', '#E91E63', '#00BCD4', '#607D8B']
+function nameColor(name) {
+  let hash = 0
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length]
+}
+function nameInitials(name) {
+  return name.trim().split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2)
+}
+
+function getRecentNames() {
+  try { return JSON.parse(localStorage.getItem('assignee-recent') ?? '[]') } catch { return [] }
+}
+function saveRecentName(name) {
+  const next = [name, ...getRecentNames().filter(n => n !== name)].slice(0, 8)
+  localStorage.setItem('assignee-recent', JSON.stringify(next))
+}
+
 function getStatusStyle(value) {
   return STATUS_OPTIONS.find(s => s.value === value) ?? STATUS_OPTIONS[0]
 }
@@ -39,13 +58,17 @@ export default function TaskRow({ task, onUpdate, onDelete }) {
   const { clientId } = useParams()
   const navigate = useNavigate()
   const [statusOpen, setStatusOpen]       = useState(false)
+  const [assigneeOpen, setAssigneeOpen]   = useState(false)
+  const [assigneeInput, setAssigneeInput] = useState('')
+  const [recentNames, setRecentNames]     = useState([])
   const [dateEditing, setDateEditing]     = useState(false)
   const [titleEditing, setTitleEditing]   = useState(false)
   const [titleValue, setTitleValue]       = useState('')
   const [checkPop, setCheckPop]           = useState(false)
-  const statusRef  = useRef(null)
-  const navTimer   = useRef(null)
-  const prevDone   = useRef(task.status === 'done')
+  const statusRef   = useRef(null)
+  const assigneeRef = useRef(null)
+  const navTimer    = useRef(null)
+  const prevDone    = useRef(task.status === 'done')
 
   useEffect(() => {
     const nowDone = task.status === 'done'
@@ -67,6 +90,17 @@ export default function TaskRow({ task, onUpdate, onDelete }) {
     document.addEventListener('mousedown', handle)
     return () => document.removeEventListener('mousedown', handle)
   }, [statusOpen])
+
+  useEffect(() => {
+    if (!assigneeOpen) return
+    setAssigneeInput('')
+    setRecentNames(getRecentNames())
+    function handle(e) {
+      if (assigneeRef.current && !assigneeRef.current.contains(e.target)) setAssigneeOpen(false)
+    }
+    document.addEventListener('mousedown', handle)
+    return () => document.removeEventListener('mousedown', handle)
+  }, [assigneeOpen])
 
   useEffect(() => {
     return () => { if (navTimer.current) clearTimeout(navTimer.current) }
@@ -105,6 +139,24 @@ export default function TaskRow({ task, onUpdate, onDelete }) {
     setTitleEditing(false)
   }
 
+  function handleAssigneeConfirm(name) {
+    const trimmed = name.trim()
+    if (trimmed) {
+      onUpdate({ assigned_to: trimmed })
+      saveRecentName(trimmed)
+    }
+    setAssigneeOpen(false)
+  }
+
+  function handleAssigneeClear() {
+    onUpdate({ assigned_to: null })
+    setAssigneeOpen(false)
+  }
+
+  const filteredRecent = recentNames.filter(n =>
+    !assigneeInput || n.toLowerCase().includes(assigneeInput.toLowerCase())
+  )
+
   return (
     <div
       ref={setNodeRef}
@@ -113,7 +165,7 @@ export default function TaskRow({ task, onUpdate, onDelete }) {
         transform: CSS.Transform.toString(transform),
         transition,
         opacity: isDragging ? 0.4 : 1,
-        gridTemplateColumns: '16px 1fr 120px 72px 72px 28px',
+        gridTemplateColumns: '16px 1fr 40px 120px 72px 72px 28px',
       }}
     >
       {/* Drag handle */}
@@ -167,6 +219,84 @@ export default function TaskRow({ task, onUpdate, onDelete }) {
           >
             {task.title}
           </span>
+        )}
+      </div>
+
+      {/* Assignee avatar — click to assign */}
+      <div className="relative flex justify-center" ref={assigneeRef}>
+        <button
+          className="tooltip"
+          data-tip={task.assigned_to ? `${task.assigned_to} — click to reassign` : 'Assign to someone'}
+          onClick={() => setAssigneeOpen(v => !v)}
+        >
+          {task.assigned_to ? (
+            <div
+              className="w-6 h-6 rounded-full flex items-center justify-center text-white font-medium select-none"
+              style={{ backgroundColor: nameColor(task.assigned_to), fontSize: '9px', letterSpacing: '0.02em' }}
+            >
+              {nameInitials(task.assigned_to)}
+            </div>
+          ) : (
+            <div
+              className="w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-60 transition-opacity"
+              style={{ border: '1.5px dashed var(--border-strong)', color: 'var(--color-subtle)' }}
+            >
+              <i className="ti ti-user-plus" style={{ fontSize: '10px' }} />
+            </div>
+          )}
+        </button>
+
+        {assigneeOpen && (
+          <div
+            className="absolute z-30 card card-elevated py-2 px-2"
+            style={{ top: '32px', left: '50%', transform: 'translateX(-50%)', width: '176px' }}
+          >
+            <input
+              autoFocus
+              className="w-full rounded-md px-2 py-1.5 text-xs text-dark-text placeholder:text-dark-subtle focus:outline-none mb-2"
+              style={{ backgroundColor: 'var(--color-elevated)', border: '1px solid var(--border-default)' }}
+              placeholder="Type a name…"
+              value={assigneeInput}
+              onChange={e => setAssigneeInput(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter' && assigneeInput.trim()) handleAssigneeConfirm(assigneeInput)
+                if (e.key === 'Escape') setAssigneeOpen(false)
+              }}
+            />
+            {filteredRecent.length > 0 && (
+              <>
+                <p className="text-xs px-1 mb-1" style={{ color: 'var(--color-subtle)' }}>Recent</p>
+                {filteredRecent.map(name => (
+                  <button
+                    key={name}
+                    className="w-full flex items-center gap-2 px-1 py-1 rounded hover:bg-dark-elevated transition-colors text-left"
+                    onClick={() => handleAssigneeConfirm(name)}
+                  >
+                    <div
+                      className="w-5 h-5 rounded-full flex items-center justify-center text-white shrink-0"
+                      style={{ backgroundColor: nameColor(name), fontSize: '8px', fontWeight: 500 }}
+                    >
+                      {nameInitials(name)}
+                    </div>
+                    <span className="text-xs truncate" style={{ color: 'var(--color-text)' }}>{name}</span>
+                    {name === task.assigned_to && (
+                      <i className="ti ti-check ml-auto shrink-0" style={{ fontSize: '11px', color: 'var(--color-brand)' }} />
+                    )}
+                  </button>
+                ))}
+              </>
+            )}
+            {task.assigned_to && (
+              <button
+                className="w-full flex items-center gap-2 px-1 py-1.5 rounded hover:bg-dark-elevated transition-colors text-left mt-1"
+                style={{ borderTop: '1px solid var(--border-subtle)' }}
+                onClick={handleAssigneeClear}
+              >
+                <i className="ti ti-user-x" style={{ fontSize: '11px', color: 'var(--color-subtle)' }} />
+                <span className="text-xs" style={{ color: 'var(--color-subtle)' }}>Remove assignee</span>
+              </button>
+            )}
+          </div>
         )}
       </div>
 
