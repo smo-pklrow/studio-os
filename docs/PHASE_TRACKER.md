@@ -278,11 +278,11 @@ Templates were considered for pre-populating task groups for recurring client ty
 
 ---
 
-### 3G — Figma Link Field
+### 3G — Figma Link Field `[COMPLETE]`
 
-- [ ] Add `figma_url text` column to `tasks` table (migration)
-- [ ] Figma link field in TaskDetail sidebar — paste URL; shows "Open in Figma ↗"
-- [ ] No file storage — URL-only, opens natively in Figma
+- [x] Add `figma_url text` column to `tasks` table (`migrations/009_figma_url.sql`)
+- [x] Figma link field in TaskDetail sidebar — paste URL → saves on blur → shows "Open in Figma ↗" link with edit + clear
+- [x] No file storage — URL-only, opens natively in Figma
 
 ---
 
@@ -326,6 +326,8 @@ Templates were considered for pre-populating task groups for recurring client ty
 | `migrations/005_portal_rls.sql` | RLS policy: public read by `share_token` | Run in SQL Editor |
 | `migrations/006_studio_name.sql` | Add `studio_name` to `profiles` | Run in SQL Editor |
 | `migrations/007_task_assignee.sql` | Add `assigned_to text` to `tasks` | **Run in SQL Editor** |
+| `migrations/008_storage_policies.sql` | RLS policies for client-logos + brain-dump-images buckets | Run in SQL Editor |
+| `migrations/009_figma_url.sql` | Add `figma_url text` to `tasks` | **Run in SQL Editor** |
 
 ---
 

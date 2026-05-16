@@ -142,6 +142,9 @@ export default function TaskDetail() {
   const [addingLink, setAddingLink]     = useState(false)
   const [linkUrl, setLinkUrl]           = useState('')
   const [linkLabel, setLinkLabel]       = useState('')
+  // Figma link
+  const [figmaEditing, setFigmaEditing] = useState(false)
+  const [figmaValue, setFigmaValue]     = useState('')
   // File upload
   const fileInputRef = useRef(null)
 
@@ -190,6 +193,12 @@ export default function TaskDetail() {
     setInspoContent('')
     setInspoCaption('')
     setInspoMode(null)
+  }
+
+  function handleFigmaSave() {
+    const trimmed = figmaValue.trim()
+    if (trimmed !== (task?.figma_url ?? '')) updateTask({ figma_url: trimmed || null })
+    setFigmaEditing(false)
   }
 
   async function handleAddLink(e) {
@@ -566,6 +575,58 @@ export default function TaskDetail() {
                 >
                   + Link thread
                 </button>
+              )}
+            </div>
+
+            {/* Figma link */}
+            <div className="card p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <svg width="14" height="14" viewBox="0 0 38 57" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
+                  <path d="M19 28.5a9.5 9.5 0 1 1 19 0 9.5 9.5 0 0 1-19 0z" fill="#1ABCFE"/>
+                  <path d="M0 47.5A9.5 9.5 0 0 1 9.5 38H19v9.5a9.5 9.5 0 0 1-19 0z" fill="#0ACF83"/>
+                  <path d="M19 0v19h9.5a9.5 9.5 0 0 0 0-19H19z" fill="#FF7262"/>
+                  <path d="M0 9.5A9.5 9.5 0 0 0 9.5 19H19V0H9.5A9.5 9.5 0 0 0 0 9.5z" fill="#F24E1E"/>
+                  <path d="M0 28.5A9.5 9.5 0 0 0 9.5 38H19V19H9.5A9.5 9.5 0 0 0 0 28.5z" fill="#A259FF"/>
+                </svg>
+                <span className="text-sm font-medium text-dark-text">Figma</span>
+              </div>
+
+              {task.figma_url && !figmaEditing ? (
+                <div className="flex items-center gap-2">
+                  <a
+                    href={task.figma_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 min-w-0 text-xs text-brand-green hover:underline truncate"
+                  >
+                    Open in Figma ↗
+                  </a>
+                  <button
+                    className="text-xs text-dark-subtle hover:text-dark-muted transition-colors shrink-0"
+                    onClick={() => { setFigmaEditing(true); setFigmaValue(task.figma_url ?? '') }}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="text-xs text-dark-subtle hover:text-red-400 transition-colors shrink-0"
+                    onClick={() => updateTask({ figma_url: null })}
+                  >
+                    ×
+                  </button>
+                </div>
+              ) : (
+                <input
+                  className="w-full bg-dark-elevated border border-dark-border rounded-lg px-2.5 py-1.5 text-xs text-dark-text placeholder:text-dark-subtle focus:outline-none focus:border-brand-green transition-colors"
+                  placeholder="Paste Figma file URL…"
+                  value={figmaEditing ? figmaValue : ''}
+                  onFocus={() => { setFigmaEditing(true); setFigmaValue(task.figma_url ?? '') }}
+                  onChange={e => setFigmaValue(e.target.value)}
+                  onBlur={handleFigmaSave}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') { e.currentTarget.blur() }
+                    if (e.key === 'Escape') { setFigmaEditing(false); setFigmaValue('') }
+                  }}
+                />
               )}
             </div>
 
