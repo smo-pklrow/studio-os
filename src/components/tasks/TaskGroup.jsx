@@ -23,7 +23,17 @@ const GROUP_COLORS = [
   '#F4A623', '#E91E63', '#00BCD4', '#607D8B',
 ]
 
-export default function TaskGroup({ group, onCreateTask, onUpdateTask, onDeleteTask, onReorder, onUpdateGroup, onDeleteGroup }) {
+export default function TaskGroup({
+  group,
+  onCreateTask,
+  onUpdateTask,
+  onDeleteTask,
+  onReorder,
+  onUpdateGroup,
+  onDeleteGroup,
+  groupDragHandleProps = null,
+  doneToBottom = false,
+}) {
   const [collapsed, setCollapsed]         = useState(false)
   const [renaming, setRenaming]           = useState(false)
   const [nameValue, setNameValue]         = useState('')
@@ -56,13 +66,16 @@ export default function TaskGroup({ group, onCreateTask, onUpdateTask, onDeleteT
     return () => document.removeEventListener('mousedown', handle)
   }, [colorOpen])
 
-  const doneCount = group.tasks.filter(t => t.status === 'done').length
+  const doneCount   = group.tasks.filter(t => t.status === 'done').length
+  const activeTasks = doneToBottom ? group.tasks.filter(t => t.status !== 'done') : group.tasks
+  const doneTasks   = doneToBottom ? group.tasks.filter(t => t.status === 'done')  : []
 
   function handleDragEnd({ active, over }) {
     if (!over || active.id === over.id) return
-    const oldIdx = group.tasks.findIndex(t => t.id === active.id)
-    const newIdx = group.tasks.findIndex(t => t.id === over.id)
-    onReorder(group.id, arrayMove(group.tasks, oldIdx, newIdx).map(t => t.id))
+    const oldIdx = activeTasks.findIndex(t => t.id === active.id)
+    const newIdx = activeTasks.findIndex(t => t.id === over.id)
+    if (oldIdx === -1 || newIdx === -1) return
+    onReorder(group.id, arrayMove(activeTasks, oldIdx, newIdx).map(t => t.id))
   }
 
   function saveRename() {
@@ -76,6 +89,17 @@ export default function TaskGroup({ group, onCreateTask, onUpdateTask, onDeleteT
     <div className="mb-2">
       {/* Group header */}
       <div ref={headerRef} className="task-group-header group flex items-center gap-2.5 py-3">
+
+        {/* Group drag handle — only rendered when parent provides groupDragHandleProps */}
+        {groupDragHandleProps && (
+          <div
+            className="tooltip opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing text-dark-subtle transition-opacity shrink-0"
+            data-tip="Drag to reorder group"
+            {...groupDragHandleProps}
+          >
+            <i className="ti ti-grid-dots" style={{ fontSize: '13px' }} />
+          </div>
+        )}
 
         {/* Color dot — click for color picker; glows when group is active in viewport */}
         <div ref={colorRef} className="relative shrink-0">
@@ -194,10 +218,10 @@ export default function TaskGroup({ group, onCreateTask, onUpdateTask, onDeleteT
             ))}
           </div>
 
-          {/* Sortable tasks */}
+          {/* Sortable active tasks */}
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <SortableContext items={group.tasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
-              {group.tasks.map(task => (
+            <SortableContext items={activeTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
+              {activeTasks.map(task => (
                 <TaskRow
                   key={task.id}
                   task={task}
@@ -207,6 +231,29 @@ export default function TaskGroup({ group, onCreateTask, onUpdateTask, onDeleteT
               ))}
             </SortableContext>
           </DndContext>
+
+          {/* Done tasks pushed to bottom — only when doneToBottom is active */}
+          {doneToBottom && doneTasks.length > 0 && (
+            <>
+              {activeTasks.length > 0 && (
+                <div className="flex items-center gap-2 px-1 py-2 mt-1">
+                  <div className="flex-1 h-px" style={{ backgroundColor: 'var(--border-subtle)' }} />
+                  <span className="text-xs" style={{ color: 'var(--color-subtle)' }}>
+                    Completed · {doneTasks.length}
+                  </span>
+                  <div className="flex-1 h-px" style={{ backgroundColor: 'var(--border-subtle)' }} />
+                </div>
+              )}
+              {doneTasks.map(task => (
+                <TaskRow
+                  key={task.id}
+                  task={task}
+                  onUpdate={fields => onUpdateTask(task.id, fields)}
+                  onDelete={() => onDeleteTask(task.id)}
+                />
+              ))}
+            </>
+          )}
 
           <AddTaskRow onAdd={title => onCreateTask(group.id, title)} />
         </>

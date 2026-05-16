@@ -1,5 +1,21 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  arrayMove,
+  useSortable,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import { useClient } from '../hooks/useClient'
 import { useTasks } from '../hooks/useTasks'
 import { useBrainDump } from '../hooks/useBrainDump'
@@ -36,6 +52,22 @@ function TaskGroupSkeleton() {
   )
 }
 
+function SortableGroup({ group, ...props }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: group.id })
+  return (
+    <div
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.4 : 1 }}
+    >
+      <TaskGroup
+        group={group}
+        groupDragHandleProps={{ ...attributes, ...listeners }}
+        {...props}
+      />
+    </div>
+  )
+}
+
 function getTab(clientId) {
   return localStorage.getItem(`tab-${clientId}`) ?? 'tasks'
 }
@@ -45,11 +77,19 @@ export default function ClientBoard() {
   const [tab, setTab] = useState(() => getTab(clientId))
   const [addingGroup, setAddingGroup] = useState(false)
   const [newGroupName, setNewGroupName] = useState('')
+  const [doneToBottom, setDoneToBottom] = useState(
+    () => localStorage.getItem(`done-bottom-${clientId}`) === 'true'
+  )
   const addGroupInputRef = useRef(null)
 
   const { client, updateClient } = useClient(clientId)
-  const { groups, loading, createGroup, createTask, updateTask, deleteTask, reorderTasks, updateGroup, deleteGroup } = useTasks(clientId)
+  const { groups, loading, createGroup, createTask, updateTask, deleteTask, reorderTasks, updateGroup, deleteGroup, reorderGroups } = useTasks(clientId)
   const { cards, createCard, updateCard, deleteCard } = useBrainDump(clientId)
+
+  const groupSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  )
 
   // Dynamic browser theme-color matches client brand color
   useEffect(() => {
@@ -78,14 +118,28 @@ export default function ClientBoard() {
   const allTasks = groups.flatMap(g => g.tasks)
   const today = new Date().toISOString().split('T')[0]
   const stats = {
-    total: allTasks.length,
-    done: allTasks.filter(t => t.status === 'done').length,
-    overdue: allTasks.filter(t => t.due_date && t.due_date < today && t.status !== 'done').length,
+    total:    allTasks.length,
+    done:     allTasks.filter(t => t.status === 'done').length,
+    overdue:  allTasks.filter(t => t.due_date && t.due_date < today && t.status !== 'done').length,
+    dueToday: allTasks.filter(t => t.due_date === today && t.status !== 'done').length,
   }
 
   function switchTab(t) {
     setTab(t)
     localStorage.setItem(`tab-${clientId}`, t)
+  }
+
+  function toggleDoneToBottom() {
+    const next = !doneToBottom
+    setDoneToBottom(next)
+    localStorage.setItem(`done-bottom-${clientId}`, String(next))
+  }
+
+  function handleGroupDragEnd({ active, over }) {
+    if (!over || active.id === over.id) return
+    const oldIdx = groups.findIndex(g => g.id === active.id)
+    const newIdx = groups.findIndex(g => g.id === over.id)
+    reorderGroups(arrayMove(groups, oldIdx, newIdx).map(g => g.id))
   }
 
   async function handleAddGroup(e) {
@@ -104,7 +158,7 @@ export default function ClientBoard() {
 
       {/* Tab bar */}
       <div className="border-b" style={{ borderColor: 'var(--border-subtle)' }}>
-        <div className="max-w-5xl mx-auto px-6 flex gap-6">
+        <div className="max-w-5xl mx-auto px-6 flex items-center gap-6">
           {[['tasks', 'Tasks'], ['braindump', 'Brain dump']].map(([value, label]) => (
             <button
               key={value}
@@ -118,6 +172,22 @@ export default function ClientBoard() {
               {label}
             </button>
           ))}
+
+          {/* Done-to-bottom toggle — only visible on tasks tab */}
+          {tab === 'tasks' && (
+            <button
+              className={`tooltip ml-auto flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-md transition-colors ${
+                doneToBottom
+                  ? 'text-brand-green bg-brand-green/10'
+                  : 'text-dark-subtle hover:text-dark-muted'
+              }`}
+              data-tip={doneToBottom ? 'Done tasks sorted to bottom — click to disable' : 'Sort done tasks to bottom'}
+              onClick={toggleDoneToBottom}
+            >
+              <i className="ti ti-checks" style={{ fontSize: '13px' }} />
+              Done last
+            </button>
+          )}
         </div>
       </div>
 
@@ -141,19 +211,27 @@ export default function ClientBoard() {
               </div>
             )}
 
-            {groups.map((group, i) => (
-              <div key={group.id} className={`animate-fade-up animate-delay-${Math.min(i + 1, 4)}`}>
-                <TaskGroup
-                  group={group}
-                  onCreateTask={createTask}
-                  onUpdateTask={updateTask}
-                  onDeleteTask={deleteTask}
-                  onReorder={reorderTasks}
-                  onUpdateGroup={updateGroup}
-                  onDeleteGroup={deleteGroup}
-                />
-              </div>
-            ))}
+            <DndContext
+              sensors={groupSensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleGroupDragEnd}
+            >
+              <SortableContext items={groups.map(g => g.id)} strategy={verticalListSortingStrategy}>
+                {groups.map(group => (
+                  <SortableGroup
+                    key={group.id}
+                    group={group}
+                    onCreateTask={createTask}
+                    onUpdateTask={updateTask}
+                    onDeleteTask={deleteTask}
+                    onReorder={reorderTasks}
+                    onUpdateGroup={updateGroup}
+                    onDeleteGroup={deleteGroup}
+                    doneToBottom={doneToBottom}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
 
             {/* New group */}
             <div className="mt-4">
@@ -183,12 +261,45 @@ export default function ClientBoard() {
 
         {/* ── Brain dump tab ──────────────────────────────────── */}
         {tab === 'braindump' && (
-          <BrainDumpCanvas
-            cards={cards}
-            onCreateCard={createCard}
-            onUpdateCard={updateCard}
-            onDeleteCard={deleteCard}
-          />
+          <>
+            {/* Explanation strip — always visible */}
+            <div
+              className="mb-6 p-4 rounded-xl flex gap-3"
+              style={{ backgroundColor: 'var(--color-elevated)', border: '1px solid var(--border-subtle)' }}
+            >
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
+                style={{ backgroundColor: 'var(--color-bg)', border: '1px solid var(--border-default)' }}
+              >
+                <i className="ti ti-bulb" style={{ fontSize: '15px', color: 'var(--color-brand)' }} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-medium mb-1" style={{ color: 'var(--color-text)' }}>Brain dump</p>
+                <p className="text-xs leading-relaxed" style={{ color: 'var(--color-muted)' }}>
+                  Your unfiltered thinking space for this client. Drop rough concepts, visual inspiration, directions, and ideas before they become tasks. No structure needed — just capture it.
+                </p>
+                <div className="flex flex-wrap items-center gap-4 mt-2.5">
+                  {[
+                    { icon: 'ti-click', label: 'Click card to edit' },
+                    { icon: 'ti-palette', label: 'Hover to recolor' },
+                    { icon: 'ti-keyboard', label: '⌘↵ to save' },
+                  ].map(({ icon, label }) => (
+                    <span key={label} className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--color-subtle)' }}>
+                      <i className={`ti ${icon}`} style={{ fontSize: '11px' }} />
+                      {label}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <BrainDumpCanvas
+              cards={cards}
+              onCreateCard={createCard}
+              onUpdateCard={updateCard}
+              onDeleteCard={deleteCard}
+            />
+          </>
         )}
       </main>
     </div>

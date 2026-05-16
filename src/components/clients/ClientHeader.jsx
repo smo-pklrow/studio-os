@@ -145,6 +145,28 @@ export default function ClientHeader({ client, stats, onHealthChange }) {
                   <span className="text-dark-muted text-xs">Due {formatDate(client.due_date)}</span>
                 )}
               </div>
+
+              {/* Stats row */}
+              {stats.total > 0 && (
+                <div className="flex items-center gap-3 mt-2 flex-wrap">
+                  <span className="text-xs" style={{ color: 'var(--color-subtle)' }}>
+                    <span style={{ color: 'var(--color-muted)' }}>{stats.done}</span>/{stats.total} tasks
+                  </span>
+                  {stats.dueToday > 0 && (
+                    <span className="text-xs text-amber-400">
+                      {stats.dueToday} due today
+                    </span>
+                  )}
+                  {stats.overdue > 0 && (
+                    <span className="text-xs text-red-400">
+                      {stats.overdue} overdue
+                    </span>
+                  )}
+                  <span className="text-xs" style={{ color: 'var(--color-subtle)' }}>
+                    Buffer: <span style={{ color: 'var(--color-muted)' }}>—</span>
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 

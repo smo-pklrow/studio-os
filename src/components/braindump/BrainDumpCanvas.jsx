@@ -3,12 +3,12 @@ import BrainDumpCard from './BrainDumpCard'
 
 const COLORS = ['amber', 'green', 'blue', 'pink', 'purple']
 
-const COLOR_DOT = {
-  amber:  '#FAC775',
-  green:  '#5DCAA5',
-  blue:   '#85B7EB',
-  pink:   '#F09595',
-  purple: '#C4A0F0',
+const COLOR_ACCENT = {
+  amber:  '#F4A623',
+  green:  '#1D9E75',
+  blue:   '#378ADD',
+  pink:   '#E85C4A',
+  purple: '#9B59B6',
 }
 
 export default function BrainDumpCanvas({ cards, onCreateCard, onUpdateCard, onDeleteCard }) {
@@ -30,14 +30,21 @@ export default function BrainDumpCanvas({ cards, onCreateCard, onUpdateCard, onD
   return (
     <div className="flex flex-wrap gap-4 py-2">
       {cards.length === 0 && !adding && (
-        <div className="w-full flex flex-col items-center justify-center py-20 text-center animate-fade-in">
-          <p className="text-sm font-medium mb-1" style={{ color: 'var(--color-text)' }}>No brain dump cards yet</p>
-          <p className="text-xs mb-6" style={{ color: 'var(--color-subtle)' }}>
-            Drop thoughts, concepts, and visual ideas here.
+        <div className="w-full flex flex-col items-center justify-center py-16 text-center animate-fade-in">
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center mb-4"
+            style={{ backgroundColor: 'var(--color-elevated)', border: '1px solid var(--border-default)' }}
+          >
+            <i className="ti ti-bulb" style={{ fontSize: '18px', color: 'var(--color-subtle)' }} />
+          </div>
+          <p className="text-sm font-medium mb-1" style={{ color: 'var(--color-text)' }}>No cards yet</p>
+          <p className="text-xs mb-6 max-w-xs leading-relaxed" style={{ color: 'var(--color-subtle)' }}>
+            Add your first thought, concept, or inspiration. This is unstructured — just capture it.
           </p>
           <button className="btn btn-primary" onClick={() => setAdding(true)}>+ Add card</button>
         </div>
       )}
+
       {cards.map(card => (
         <BrainDumpCard
           key={card.id}
@@ -50,29 +57,31 @@ export default function BrainDumpCanvas({ cards, onCreateCard, onUpdateCard, onD
       {/* Add card form */}
       {adding ? (
         <div
-          className="w-48 min-h-[148px] rounded-xl p-4 flex flex-col gap-3"
-          style={{ backgroundColor: 'var(--color-elevated)', border: '1px solid var(--border-default)' }}
+          className="w-52 min-h-[160px] rounded-xl flex flex-col overflow-hidden"
+          style={{ backgroundColor: 'var(--color-elevated)', border: `1px solid var(--border-default)`, borderTop: `3px solid ${COLOR_ACCENT[color]}` }}
         >
-          <textarea
-            autoFocus
-            className="flex-1 bg-transparent text-sm text-dark-text placeholder:text-dark-subtle resize-none focus:outline-none min-h-[80px]"
-            placeholder="Write something…"
-            value={content}
-            onChange={e => setContent(e.target.value)}
-            onKeyDown={handleKeyDown}
-          />
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex-1 p-4 pb-2">
+            <textarea
+              autoFocus
+              className="w-full bg-transparent text-sm text-dark-text placeholder:text-dark-subtle resize-none focus:outline-none min-h-[96px] leading-relaxed"
+              placeholder="Write something…"
+              value={content}
+              onChange={e => setContent(e.target.value)}
+              onKeyDown={handleKeyDown}
+            />
+          </div>
+          <div className="px-4 pb-3 flex items-center justify-between">
             <div className="flex gap-1.5">
               {COLORS.map(c => (
                 <button
                   key={c}
-                  className="w-3.5 h-3.5 rounded-full transition-transform hover:scale-110"
+                  className="w-3 h-3 rounded-full transition-transform hover:scale-125"
                   style={{
-                    backgroundColor: COLOR_DOT[c],
-                    outline: color === c ? `2px solid ${COLOR_DOT[c]}` : 'none',
-                    outlineOffset: '2px',
+                    backgroundColor: COLOR_ACCENT[c],
+                    boxShadow: color === c ? `0 0 0 2px var(--color-elevated), 0 0 0 3.5px ${COLOR_ACCENT[c]}` : 'none',
                   }}
                   onClick={() => setColor(c)}
+                  aria-label={c}
                 />
               ))}
             </div>
@@ -87,14 +96,18 @@ export default function BrainDumpCanvas({ cards, onCreateCard, onUpdateCard, onD
           </div>
         </div>
       ) : (
-        <button
-          className="w-48 min-h-[148px] rounded-xl flex flex-col items-center justify-center gap-2 text-dark-subtle hover:text-dark-muted transition-colors"
-          style={{ border: '2px dashed var(--border-default)' }}
-          onClick={() => setAdding(true)}
-        >
-          <span className="text-2xl leading-none select-none">+</span>
-          <span className="text-xs">Add card</span>
-        </button>
+        cards.length > 0 && (
+          <button
+            className="w-52 min-h-[160px] rounded-xl flex flex-col items-center justify-center gap-2 transition-colors"
+            style={{ border: '2px dashed var(--border-default)', color: 'var(--color-subtle)' }}
+            onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--border-strong)'}
+            onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border-default)'}
+            onClick={() => setAdding(true)}
+          >
+            <i className="ti ti-plus" style={{ fontSize: '20px' }} />
+            <span className="text-xs">Add card</span>
+          </button>
+        )
       )}
     </div>
   )

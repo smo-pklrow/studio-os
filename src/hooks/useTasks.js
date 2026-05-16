@@ -106,5 +106,13 @@ export function useTasks(clientId) {
     return { error }
   }
 
-  return { groups, loading, error, createGroup, createTask, updateTask, deleteTask, reorderTasks, updateGroup, deleteGroup }
+  async function reorderGroups(newGroupIds) {
+    const byId = Object.fromEntries(groups.map(g => [g.id, g]))
+    setGroups(newGroupIds.map((id, i) => ({ ...byId[id], sort_order: i })))
+    await Promise.all(
+      newGroupIds.map((id, i) => supabase.from('task_groups').update({ sort_order: i }).eq('id', id))
+    )
+  }
+
+  return { groups, loading, error, createGroup, createTask, updateTask, deleteTask, reorderTasks, updateGroup, deleteGroup, reorderGroups }
 }
