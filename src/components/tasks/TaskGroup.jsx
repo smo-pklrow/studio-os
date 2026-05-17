@@ -91,7 +91,7 @@ export default function TaskGroup({
       <div
         ref={headerRef}
         className="task-group-header group flex items-center gap-2.5 py-3"
-        style={{ borderBottom: `2px solid ${group.color}45` }}
+        style={{ borderBottom: `2px solid ${group.color}73` }}
       >
 
         {/* Group drag handle — only rendered when parent provides groupDragHandleProps */}

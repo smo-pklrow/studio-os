@@ -166,7 +166,7 @@ export default function TaskRow({ task, onUpdate, onDelete, groupColor }) {
         transition,
         opacity: isDragging ? 0.4 : isDone ? 0.45 : 1,
         gridTemplateColumns: '16px 1fr 40px 120px 72px 72px 28px',
-        borderLeft: groupColor ? `2px solid ${groupColor}` : undefined,
+        boxShadow: groupColor ? `inset 3px 0 0 ${groupColor}` : undefined,
       }}
     >
       {/* Drag handle */}
