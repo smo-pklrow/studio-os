@@ -88,7 +88,11 @@ export default function TaskGroup({
   return (
     <div className="mb-2">
       {/* Group header */}
-      <div ref={headerRef} className="task-group-header group flex items-center gap-2.5 py-3">
+      <div
+        ref={headerRef}
+        className="task-group-header group flex items-center gap-2.5 py-3"
+        style={{ borderBottom: `2px solid ${group.color}45` }}
+      >
 
         {/* Group drag handle — only rendered when parent provides groupDragHandleProps */}
         {groupDragHandleProps && (
@@ -104,11 +108,13 @@ export default function TaskGroup({
         {/* Color dot — click for color picker; glows when group is active in viewport */}
         <div ref={colorRef} className="relative shrink-0">
           <button
-            className="tooltip w-2.5 h-2.5 rounded-full hover:scale-125 transition-all duration-300 focus:outline-none"
+            className="tooltip w-3 h-3 rounded-full hover:scale-125 transition-all duration-300 focus:outline-none"
             style={{
               backgroundColor: group.color,
               transform: isActive ? 'scale(1.25)' : 'scale(1)',
-              boxShadow: isActive ? `0 0 0 3px ${group.color}40` : 'none',
+              boxShadow: isActive
+                ? `0 0 0 4px ${group.color}50`
+                : `0 0 0 2px ${group.color}28`,
             }}
             data-tip="Change color"
             onClick={() => setColorOpen(v => !v)}
@@ -209,8 +215,12 @@ export default function TaskGroup({
         <>
           {/* Column headers */}
           <div
-            className="grid items-center gap-3 px-1 pb-1"
-            style={{ gridTemplateColumns: '16px 1fr 40px 120px 72px 72px 28px' }}
+            className="grid items-center gap-3 px-1 pb-2"
+            style={{
+              gridTemplateColumns: '16px 1fr 40px 120px 72px 72px 28px',
+              borderBottom: '1px solid var(--border-default)',
+              marginBottom: '2px',
+            }}
           >
             <span />
             {COL_HEADERS.map((h, i) => (
@@ -227,6 +237,7 @@ export default function TaskGroup({
                   task={task}
                   onUpdate={fields => onUpdateTask(task.id, fields)}
                   onDelete={() => onDeleteTask(task.id)}
+                  groupColor={group.color}
                 />
               ))}
             </SortableContext>
@@ -250,6 +261,7 @@ export default function TaskGroup({
                   task={task}
                   onUpdate={fields => onUpdateTask(task.id, fields)}
                   onDelete={() => onDeleteTask(task.id)}
+                  groupColor={group.color}
                 />
               ))}
             </>

@@ -12,9 +12,9 @@
 
   /* --- Surfaces ------------------------------------------------ */
   --color-bg:             #1E1E1C;
-  --color-surface:        #252523;
-  --color-elevated:       #2A2A28;
-  --color-elevated-hi:    #323230;
+  --color-surface:        #272725;
+  --color-elevated:       #2F2F2D;
+  --color-elevated-hi:    #383836;
   --color-overlay:        rgba(0, 0, 0, 0.55);
 
   /* --- Brand --------------------------------------------------- */
@@ -30,9 +30,9 @@
   --color-subtle:         #6B6963;
 
   /* --- Borders / dividers ------------------------------------- */
-  --border-subtle:        rgba(255, 255, 255, 0.05);
-  --border-default:       rgba(255, 255, 255, 0.08);
-  --border-strong:        rgba(255, 255, 255, 0.14);
+  --border-subtle:        rgba(255, 255, 255, 0.06);
+  --border-default:       rgba(255, 255, 255, 0.10);
+  --border-strong:        rgba(255, 255, 255, 0.17);
   --border-brand:         rgba(29, 158, 117, 0.45);
 
   /* --- Status accents (badges) -------------------------------- */

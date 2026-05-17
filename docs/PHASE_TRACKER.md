@@ -2,7 +2,7 @@
 
 > Update this file after every session. Mark tasks `[x]` when complete. Add blockers inline.
 
-**Current phase**: Phase 2 — Core UX Completion (2J complete → Phase 3 next)
+**Current phase**: Phase 3 — Intelligence Layer (3D + 3G complete → 3E next)
 **Last updated**: 2026-05-16
 
 ---
@@ -251,13 +251,18 @@ Templates were considered for pre-populating task groups for recurring client ty
 
 ---
 
-### 3D — AI Brief + Smart Tools
+### 3D — AI Brief Generator `[COMPLETE]`
 
-- [ ] Edge Function: `/generate-brief` — brain dump cards → structured shareable client brief
-- [ ] Edge Function: `/auto-tag` — brain dump entries → theme tags (brand, copy, visual, strategy)
-- [ ] Brief preview modal in ClientBoard brain dump tab
-- [ ] AI tag chips on brain dump cards
-- [ ] "Extract action items" in TaskDetail notes — Claude reads notes → returns calendar items
+- [x] Edge Function: `generate-brief` — reads brain dump text cards, strips HTML, calls Claude API (`claude-sonnet-4-6`), returns structured JSON brief with 5 sections
+- [x] `BriefModal.jsx` — loading spinner, error state, 5 formatted sections, copy-to-clipboard (plain text format)
+- [x] "Generate client brief" button in brain dump tab — only shown when text cards exist; opens modal; calls edge function via `supabase.functions.invoke`
+- [x] Brief sections: Project overview, Design direction, Key decisions, Open questions, Next steps
+
+**Deploy step required**: `supabase functions deploy generate-brief` — needs `ANTHROPIC_API_KEY` set in Supabase dashboard → Settings → Edge Functions secrets.
+
+**Deferred to later**:
+- Auto-tag brain dump entries (theme chips: brand, copy, visual, strategy)
+- Extract action items from notes → calendar items
 
 ---
 

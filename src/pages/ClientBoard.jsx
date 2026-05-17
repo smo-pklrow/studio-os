@@ -19,9 +19,12 @@ import { CSS } from '@dnd-kit/utilities'
 import { useClient } from '../hooks/useClient'
 import { useTasks } from '../hooks/useTasks'
 import { useBrainDump } from '../hooks/useBrainDump'
+import { supabase } from '../lib/supabase'
+import { useToast } from '../components/shared/Toast'
 import ClientHeader from '../components/clients/ClientHeader'
 import TaskGroup from '../components/tasks/TaskGroup'
 import BrainDumpCanvas from '../components/braindump/BrainDumpCanvas'
+import BriefModal from '../components/braindump/BriefModal'
 
 const GROUP_COLORS = ['#378ADD', '#1D9E75', '#E85C4A', '#9B59B6', '#F4A623', '#E91E63', '#00BCD4']
 
@@ -85,6 +88,28 @@ export default function ClientBoard() {
   const { client, updateClient } = useClient(clientId)
   const { groups, loading, createGroup, createTask, updateTask, deleteTask, reorderTasks, updateGroup, deleteGroup, reorderGroups } = useTasks(clientId)
   const { cards, createCard, createImageCard, updateCard, deleteCard } = useBrainDump(clientId)
+  const toast = useToast()
+
+  const [briefOpen, setBriefOpen]     = useState(false)
+  const [briefLoading, setBriefLoading] = useState(false)
+  const [briefError, setBriefError]   = useState(null)
+  const [briefData, setBriefData]     = useState(null)
+
+  async function handleGenerateBrief() {
+    setBriefOpen(true)
+    setBriefLoading(true)
+    setBriefError(null)
+    setBriefData(null)
+    const { data, error } = await supabase.functions.invoke('generate-brief', {
+      body: { clientId },
+    })
+    setBriefLoading(false)
+    if (error || data?.error) {
+      setBriefError(data?.error ?? error?.message ?? 'Something went wrong.')
+    } else {
+      setBriefData({ ...data, cardCount: cards.filter(c => c.type !== 'image').length })
+    }
+  }
 
   const groupSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -155,6 +180,15 @@ export default function ClientBoard() {
     <div className="flex flex-col flex-1">
 
       <ClientHeader client={client} stats={stats} onHealthChange={health => updateClient({ health })} />
+
+      {briefOpen && (
+        <BriefModal
+          loading={briefLoading}
+          error={briefError}
+          data={briefData}
+          onClose={() => setBriefOpen(false)}
+        />
+      )}
 
       {/* Tab bar */}
       <div className="border-b" style={{ borderColor: 'var(--border-subtle)' }}>
@@ -300,6 +334,23 @@ export default function ClientBoard() {
               onUpdateCard={updateCard}
               onDeleteCard={deleteCard}
             />
+
+            {cards.filter(c => c.type !== 'image').length > 0 && (
+              <div className="mt-6 flex justify-center">
+                <button
+                  className="flex items-center gap-2 text-sm px-4 py-2 rounded-xl transition-colors"
+                  style={{
+                    backgroundColor: 'var(--color-brand-deep)',
+                    border: '1px solid var(--border-brand)',
+                    color: 'var(--color-brand-tint)',
+                  }}
+                  onClick={handleGenerateBrief}
+                >
+                  <div className="w-3.5 h-3.5 rounded-sm shrink-0" style={{ backgroundColor: 'var(--color-brand)' }} />
+                  Generate client brief
+                </button>
+              </div>
+            )}
           </>
         )}
       </main>

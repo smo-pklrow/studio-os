@@ -54,7 +54,7 @@ function getDueState(task) {
   return 'normal'
 }
 
-export default function TaskRow({ task, onUpdate, onDelete }) {
+export default function TaskRow({ task, onUpdate, onDelete, groupColor }) {
   const { clientId } = useParams()
   const navigate = useNavigate()
   const [statusOpen, setStatusOpen]       = useState(false)
@@ -164,8 +164,9 @@ export default function TaskRow({ task, onUpdate, onDelete }) {
       style={{
         transform: CSS.Transform.toString(transform),
         transition,
-        opacity: isDragging ? 0.4 : 1,
+        opacity: isDragging ? 0.4 : isDone ? 0.45 : 1,
         gridTemplateColumns: '16px 1fr 40px 120px 72px 72px 28px',
+        borderLeft: groupColor ? `2px solid ${groupColor}` : undefined,
       }}
     >
       {/* Drag handle */}
