@@ -179,7 +179,7 @@ export default function ClientRow({ client, onArchive, onEdit, onPause, onHealth
         onClick={e => { e.stopPropagation(); setMenuOpen(v => !v) }}
         aria-label="Client options"
       >
-        <i className="ti ti-dots" style={{ fontSize: '16px' }} />
+        <i className="ti ti-dots" style={{ fontSize: 'var(--icon-lg)' }} />
       </button>
 
       {menuOpen && (

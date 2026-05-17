@@ -23,8 +23,8 @@ export function ToastProvider({ children }) {
       <div className="fixed bottom-5 right-5 flex flex-col items-end gap-2 z-50 pointer-events-none">
         {toasts.map(t => (
           <div key={t.id} className={`toast-item toast-${t.type}`}>
-            {t.type === 'success' && <i className="ti ti-check" style={{ fontSize: '13px' }} />}
-            {t.type === 'error'   && <i className="ti ti-alert-circle" style={{ fontSize: '13px' }} />}
+            {t.type === 'success' && <i className="ti ti-check" style={{ fontSize: 'var(--icon-md)' }} />}
+            {t.type === 'error'   && <i className="ti ti-alert-circle" style={{ fontSize: 'var(--icon-md)' }} />}
             {t.message}
           </div>
         ))}

@@ -16,9 +16,9 @@ const COLORS = {
 const COLOR_LIST = Object.keys(COLORS)
 
 const TOOLBAR = [
-  { key: 'bold',       render: () => <span style={{ fontWeight: 700, fontSize: '13px' }}>B</span>,  toggle: e => e.chain().focus().toggleBold().run()       },
-  { key: 'italic',     render: () => <span style={{ fontStyle: 'italic', fontSize: '13px' }}>I</span>, toggle: e => e.chain().focus().toggleItalic().run()     },
-  { key: 'bulletList', render: () => <i className="ti ti-list" style={{ fontSize: '12px' }} />,     toggle: e => e.chain().focus().toggleBulletList().run() },
+  { key: 'bold',       render: () => <span style={{ fontWeight: 700, fontSize: 'var(--icon-md)' }}>B</span>,  toggle: e => e.chain().focus().toggleBold().run()       },
+  { key: 'italic',     render: () => <span style={{ fontStyle: 'italic', fontSize: 'var(--icon-md)' }}>I</span>, toggle: e => e.chain().focus().toggleItalic().run()     },
+  { key: 'bulletList', render: () => <i className="ti ti-list" style={{ fontSize: 'var(--icon-sm)' }} />,     toggle: e => e.chain().focus().toggleBulletList().run() },
 ]
 
 function AddTextCardForm({ onSave, onCancel }) {
@@ -236,7 +236,7 @@ export default function BrainDumpCanvas({ cards, onCreateCard, onCreateImageCard
           }}
           onClick={() => setAddMode('text')}
         >
-          <i className="ti ti-text-size" style={{ fontSize: '13px' }} />
+          <i className="ti ti-text-size" style={{ fontSize: 'var(--icon-md)' }} />
           Text note
         </button>
         <button
@@ -248,7 +248,7 @@ export default function BrainDumpCanvas({ cards, onCreateCard, onCreateImageCard
           }}
           onClick={() => fileInputRef.current?.click()}
         >
-          <i className="ti ti-photo" style={{ fontSize: '13px' }} />
+          <i className="ti ti-photo" style={{ fontSize: 'var(--icon-md)' }} />
           Image
         </button>
         <input
@@ -279,7 +279,7 @@ export default function BrainDumpCanvas({ cards, onCreateCard, onCreateImageCard
             className="w-10 h-10 rounded-xl flex items-center justify-center mb-4"
             style={{ backgroundColor: 'var(--color-elevated)', border: '1px solid var(--border-default)' }}
           >
-            <i className="ti ti-bulb" style={{ fontSize: '18px', color: 'var(--color-subtle)' }} />
+            <i className="ti ti-bulb" style={{ fontSize: 'var(--icon-xl)', color: 'var(--color-subtle)' }} />
           </div>
           <p className="text-sm font-medium mb-1" style={{ color: 'var(--color-text)' }}>No cards yet</p>
           <p className="text-xs mb-6 max-w-xs leading-relaxed" style={{ color: 'var(--color-subtle)' }}>
@@ -287,11 +287,11 @@ export default function BrainDumpCanvas({ cards, onCreateCard, onCreateImageCard
           </p>
           <div className="flex items-center gap-2">
             <button className="btn btn-primary" onClick={() => setAddMode('text')}>
-              <i className="ti ti-text-size" style={{ fontSize: '13px' }} />
+              <i className="ti ti-text-size" style={{ fontSize: 'var(--icon-md)' }} />
               Text note
             </button>
             <button className="btn" onClick={() => fileInputRef.current?.click()}>
-              <i className="ti ti-photo" style={{ fontSize: '13px' }} />
+              <i className="ti ti-photo" style={{ fontSize: 'var(--icon-md)' }} />
               Image
             </button>
           </div>

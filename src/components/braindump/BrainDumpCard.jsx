@@ -14,9 +14,9 @@ const COLORS = {
 const COLOR_LIST = Object.keys(COLORS)
 
 const TOOLBAR = [
-  { key: 'bold',       render: () => <span style={{ fontWeight: 700, fontSize: '13px' }}>B</span>,  toggle: e => e.chain().focus().toggleBold().run()       },
-  { key: 'italic',     render: () => <span style={{ fontStyle: 'italic', fontSize: '13px' }}>I</span>, toggle: e => e.chain().focus().toggleItalic().run()     },
-  { key: 'bulletList', render: () => <i className="ti ti-list" style={{ fontSize: '12px' }} />,     toggle: e => e.chain().focus().toggleBulletList().run() },
+  { key: 'bold',       render: () => <span style={{ fontWeight: 700, fontSize: 'var(--icon-md)' }}>B</span>,  toggle: e => e.chain().focus().toggleBold().run()       },
+  { key: 'italic',     render: () => <span style={{ fontStyle: 'italic', fontSize: 'var(--icon-md)' }}>I</span>, toggle: e => e.chain().focus().toggleItalic().run()     },
+  { key: 'bulletList', render: () => <i className="ti ti-list" style={{ fontSize: 'var(--icon-sm)' }} />,     toggle: e => e.chain().focus().toggleBulletList().run() },
 ]
 
 function EditingText({ card, colors, onUpdate, onDone }) {
@@ -79,7 +79,7 @@ function EditingText({ card, colors, onUpdate, onDone }) {
             {btn.render()}
           </button>
         ))}
-        <span className="ml-auto" style={{ color: colors.fg, opacity: 0.2, fontSize: '10px' }}>⌘↵</span>
+        <span className="ml-auto" style={{ color: colors.fg, opacity: 0.2, fontSize: 'var(--icon-xs)' }}>⌘↵</span>
       </div>
       <EditorContent editor={editor} className="flex-1" />
     </div>
@@ -115,7 +115,7 @@ function TextCard({ card, colors, onUpdate }) {
           dangerouslySetInnerHTML={{ __html: card.content }}
         />
       ) : (
-        <span style={{ color: colors.fg, opacity: 0.28, fontSize: '13px' }}>Click to write…</span>
+        <span style={{ color: colors.fg, opacity: 0.28, fontSize: 'var(--font-size-sm)' }}>Click to write…</span>
       )}
     </div>
   )
@@ -130,8 +130,8 @@ function ImageCard({ card }) {
         className="flex-1 flex flex-col items-center justify-center gap-2 rounded-t"
         style={{ minHeight: '180px', backgroundColor: 'rgba(0,0,0,0.2)' }}
       >
-        <i className="ti ti-photo-off" style={{ fontSize: '24px', opacity: 0.3 }} />
-        <span style={{ fontSize: '11px', opacity: 0.3 }}>Image unavailable</span>
+        <i className="ti ti-photo-off" style={{ fontSize: 'var(--icon-2xl)', opacity: 0.3 }} />
+        <span style={{ fontSize: 'var(--icon-xs)', opacity: 0.3 }}>Image unavailable</span>
       </div>
     )
   }
@@ -196,7 +196,7 @@ export default function BrainDumpCard({ card, onUpdate, onDelete }) {
           aria-label="Delete card"
           onClick={onDelete}
         >
-          <i className="ti ti-x" style={{ fontSize: '11px' }} />
+          <i className="ti ti-x" style={{ fontSize: 'var(--icon-xs)' }} />
         </button>
       </div>
     </div>

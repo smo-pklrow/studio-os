@@ -176,7 +176,7 @@ export default function TaskRow({ task, onUpdate, onDelete, groupColor }) {
         {...attributes}
         {...listeners}
       >
-        <i className="ti ti-grip-vertical" style={{ fontSize: '14px' }} />
+        <i className="ti ti-grip-vertical" style={{ fontSize: 'var(--icon-base)' }} />
       </div>
 
       {/* Checkbox + title */}
@@ -237,7 +237,7 @@ export default function TaskRow({ task, onUpdate, onDelete, groupColor }) {
           {task.assigned_to ? (
             <div
               className="w-6 h-6 rounded-full flex items-center justify-center text-white font-medium select-none"
-              style={{ backgroundColor: nameColor(task.assigned_to), fontSize: '9px', letterSpacing: '0.02em' }}
+              style={{ backgroundColor: nameColor(task.assigned_to), fontSize: 'var(--icon-2xs)', letterSpacing: '0.02em' }}
             >
               {nameInitials(task.assigned_to)}
             </div>
@@ -252,7 +252,7 @@ export default function TaskRow({ task, onUpdate, onDelete, groupColor }) {
               onMouseEnter={e => e.currentTarget.style.opacity = '0.7'}
               onMouseLeave={e => e.currentTarget.style.opacity = '0.22'}
             >
-              <i className="ti ti-user-plus" style={{ fontSize: '10px' }} />
+              <i className="ti ti-user-plus" style={{ fontSize: 'var(--icon-xs)' }} />
             </div>
           )}
         </button>
@@ -285,13 +285,13 @@ export default function TaskRow({ task, onUpdate, onDelete, groupColor }) {
                   >
                     <div
                       className="w-5 h-5 rounded-full flex items-center justify-center text-white shrink-0"
-                      style={{ backgroundColor: nameColor(name), fontSize: '8px', fontWeight: 500 }}
+                      style={{ backgroundColor: nameColor(name), fontSize: 'var(--icon-2xs)', fontWeight: 500 }}
                     >
                       {nameInitials(name)}
                     </div>
                     <span className="text-xs truncate" style={{ color: 'var(--color-text)' }}>{name}</span>
                     {name === task.assigned_to && (
-                      <i className="ti ti-check ml-auto shrink-0" style={{ fontSize: '11px', color: 'var(--color-brand)' }} />
+                      <i className="ti ti-check ml-auto shrink-0" style={{ fontSize: 'var(--icon-xs)', color: 'var(--color-brand)' }} />
                     )}
                   </button>
                 ))}
@@ -303,7 +303,7 @@ export default function TaskRow({ task, onUpdate, onDelete, groupColor }) {
                 style={{ borderTop: '1px solid var(--border-subtle)' }}
                 onClick={handleAssigneeClear}
               >
-                <i className="ti ti-user-x" style={{ fontSize: '11px', color: 'var(--color-subtle)' }} />
+                <i className="ti ti-user-x" style={{ fontSize: 'var(--icon-xs)', color: 'var(--color-subtle)' }} />
                 <span className="text-xs" style={{ color: 'var(--color-subtle)' }}>Remove assignee</span>
               </button>
             )}
@@ -379,7 +379,7 @@ export default function TaskRow({ task, onUpdate, onDelete, groupColor }) {
         aria-label="Delete task"
         onClick={onDelete}
       >
-        <i className="ti ti-x" style={{ fontSize: '12px' }} />
+        <i className="ti ti-x" style={{ fontSize: 'var(--icon-sm)' }} />
       </button>
     </div>
   )

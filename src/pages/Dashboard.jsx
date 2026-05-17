@@ -145,7 +145,7 @@ export default function Dashboard() {
               className="leading-tight mb-1"
               style={{
                 fontFamily: 'var(--font-display)',
-                fontSize: 'clamp(26px, 3.5vw, 36px)',
+                fontSize: 'var(--font-size-display)',
                 fontWeight: 400,
                 letterSpacing: '-0.01em',
                 color: 'var(--color-text)',
@@ -182,7 +182,7 @@ export default function Dashboard() {
               border: '1px solid var(--border-brand)',
             }}
           >
-            <i className="ti ti-share shrink-0" style={{ color: 'var(--color-brand-tint)', fontSize: '16px' }} />
+            <i className="ti ti-share shrink-0" style={{ color: 'var(--color-brand-tint)', fontSize: 'var(--icon-lg)' }} />
             <div className="flex-1 min-w-0 text-sm">
               <span style={{ color: 'var(--color-brand-tint)', fontWeight: 500 }}>Share your client portal</span>
               <span style={{ color: 'var(--color-muted)' }}> — give your client a live view of their project. No login required.</span>
@@ -200,7 +200,7 @@ export default function Dashboard() {
               onClick={dismissNudge}
               aria-label="Dismiss"
             >
-              <i className="ti ti-x" style={{ fontSize: '12px' }} />
+              <i className="ti ti-x" style={{ fontSize: 'var(--icon-sm)' }} />
             </button>
           </div>
         )}
@@ -257,7 +257,7 @@ export default function Dashboard() {
                 className="w-14 h-14 rounded-2xl flex items-center justify-center mb-5"
                 style={{ backgroundColor: 'var(--color-brand-deep)', color: 'var(--color-brand-tint)' }}
               >
-                <i className="ti ti-users" style={{ fontSize: '24px' }} />
+                <i className="ti ti-users" style={{ fontSize: 'var(--icon-2xl)' }} />
               </div>
               <p className="text-dark-text text-sm font-medium mb-1">No clients yet</p>
               <p className="text-dark-muted text-xs mb-6 max-w-xs leading-relaxed">

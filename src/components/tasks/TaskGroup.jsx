@@ -101,7 +101,7 @@ export default function TaskGroup({
             data-tip="Drag to reorder group"
             {...groupDragHandleProps}
           >
-            <i className="ti ti-grid-dots" style={{ fontSize: '13px' }} />
+            <i className="ti ti-grid-dots" style={{ fontSize: 'var(--icon-md)' }} />
           </div>
         )}
 
@@ -196,7 +196,7 @@ export default function TaskGroup({
             onClick={() => setDeleteConfirm(true)}
             aria-label="Delete group"
           >
-            <i className="ti ti-x" style={{ fontSize: '12px' }} />
+            <i className="ti ti-x" style={{ fontSize: 'var(--icon-sm)' }} />
           </button>
         )}
 
@@ -207,7 +207,7 @@ export default function TaskGroup({
           onClick={() => setCollapsed(v => !v)}
           aria-label={collapsed ? 'Expand group' : 'Collapse group'}
         >
-          <i className={`ti ${collapsed ? 'ti-chevron-right' : 'ti-chevron-down'}`} style={{ fontSize: '13px' }} />
+          <i className={`ti ${collapsed ? 'ti-chevron-right' : 'ti-chevron-down'}`} style={{ fontSize: 'var(--icon-md)' }} />
         </button>
       </div>
 

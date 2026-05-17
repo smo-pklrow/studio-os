@@ -218,7 +218,7 @@ export default function ClientBoard() {
               data-tip={doneToBottom ? 'Done tasks sorted to bottom — click to disable' : 'Sort done tasks to bottom'}
               onClick={toggleDoneToBottom}
             >
-              <i className="ti ti-checks" style={{ fontSize: '13px' }} />
+              <i className="ti ti-checks" style={{ fontSize: 'var(--icon-md)' }} />
               Done last
             </button>
           )}
@@ -305,7 +305,7 @@ export default function ClientBoard() {
                 className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
                 style={{ backgroundColor: 'var(--color-bg)', border: '1px solid var(--border-default)' }}
               >
-                <i className="ti ti-bulb" style={{ fontSize: '15px', color: 'var(--color-brand)' }} />
+                <i className="ti ti-bulb" style={{ fontSize: 'var(--icon-base)', color: 'var(--color-brand)' }} />
               </div>
               <div className="min-w-0">
                 <p className="text-sm font-medium mb-1" style={{ color: 'var(--color-text)' }}>Brain dump</p>
@@ -319,7 +319,7 @@ export default function ClientBoard() {
                     { icon: 'ti-palette', label: 'Hover card to recolor or delete' },
                   ].map(({ icon, label }) => (
                     <span key={label} className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--color-subtle)' }}>
-                      <i className={`ti ${icon}`} style={{ fontSize: '11px' }} />
+                      <i className={`ti ${icon}`} style={{ fontSize: 'var(--icon-xs)' }} />
                       {label}
                     </span>
                   ))}

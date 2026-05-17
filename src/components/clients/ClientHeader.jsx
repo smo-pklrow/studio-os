@@ -92,7 +92,7 @@ export default function ClientHeader({ client, stats, onHealthChange }) {
                 className="leading-none truncate"
                 style={{
                   fontFamily: 'var(--font-display)',
-                  fontSize: 'clamp(24px, 3.5vw, 36px)',
+                  fontSize: 'var(--font-size-display-sm)',
                   fontWeight: 400,
                   letterSpacing: '-0.02em',
                   color: 'var(--color-text)',
@@ -172,7 +172,7 @@ export default function ClientHeader({ client, stats, onHealthChange }) {
 
           {/* Actions */}
           <button className="btn shrink-0" onClick={copyLink}>
-            <i className="ti ti-share" style={{ fontSize: '13px' }} />
+            <i className="ti ti-share" style={{ fontSize: 'var(--icon-md)' }} />
             Client link
           </button>
         </div>

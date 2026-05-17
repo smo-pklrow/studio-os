@@ -78,7 +78,7 @@ export default function BriefModal({ loading, error, data, onClose }) {
           <div className="flex items-center gap-2">
             {data?.brief && (
               <button className="btn text-xs" onClick={handleCopy}>
-                <i className="ti ti-copy" style={{ fontSize: '12px' }} />
+                <i className="ti ti-copy" style={{ fontSize: 'var(--icon-sm)' }} />
                 Copy
               </button>
             )}
@@ -87,7 +87,7 @@ export default function BriefModal({ loading, error, data, onClose }) {
               style={{ color: 'var(--color-muted)' }}
               onClick={onClose}
             >
-              <i className="ti ti-x" style={{ fontSize: '13px' }} />
+              <i className="ti ti-x" style={{ fontSize: 'var(--icon-md)' }} />
             </button>
           </div>
         </div>
@@ -106,7 +106,7 @@ export default function BriefModal({ loading, error, data, onClose }) {
 
           {error && (
             <div className="flex flex-col items-center justify-center py-12 gap-2">
-              <i className="ti ti-alert-circle" style={{ fontSize: '24px', color: 'var(--color-red)' }} />
+              <i className="ti ti-alert-circle" style={{ fontSize: 'var(--icon-2xl)', color: 'var(--color-red)' }} />
               <p className="text-sm text-center" style={{ color: 'var(--color-muted)' }}>{error}</p>
             </div>
           )}

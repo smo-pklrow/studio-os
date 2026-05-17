@@ -47,7 +47,7 @@ export default function CommandPalette({ onClose }) {
       >
         {/* Search input */}
         <div className="flex items-center gap-3 px-4 py-3 border-b" style={{ borderColor: 'var(--border-default)' }}>
-          <i className="ti ti-search shrink-0" style={{ fontSize: '16px', color: 'var(--color-muted)' }} />
+          <i className="ti ti-search shrink-0" style={{ fontSize: 'var(--icon-lg)', color: 'var(--color-muted)' }} />
           <input
             ref={inputRef}
             className="flex-1 bg-transparent text-sm focus:outline-none placeholder:text-dark-subtle"
@@ -86,7 +86,7 @@ export default function CommandPalette({ onClose }) {
                   className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
                   style={{ backgroundColor: 'var(--color-elevated)', color: 'var(--color-muted)' }}
                 >
-                  <i className={`ti ${item.icon}`} style={{ fontSize: '14px' }} />
+                  <i className={`ti ${item.icon}`} style={{ fontSize: 'var(--icon-base)' }} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <span className="text-sm" style={{ color: 'var(--color-text)' }}>{item.label}</span>
